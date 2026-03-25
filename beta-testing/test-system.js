@@ -35,8 +35,8 @@ async function fullSystemTest() {
   const adminRes = await fetch('http://localhost:3002/admin/index.html');
   console.log('   ✓ Admin page status:', adminRes.status);
 
-  const helloRes = await fetch('http://localhost:3002/hello.html');
-  console.log('   ✓ Hello.html status:', helloRes.status);
+  const betaIndexRes = await fetch('http://localhost:3002/beta-testing/index.html');
+  console.log('   ✓ Beta index status:', betaIndexRes.status);
 
   const loginPageRes = await fetch('http://localhost:3002/login.html');
   console.log('   ✓ Login page status:', loginPageRes.status);
