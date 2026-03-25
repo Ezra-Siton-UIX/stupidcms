@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Bobby Smith new version (copy)",
+    "slug": "bobby-smith-copy-c3nx",
+    "image_url": "https://res.cloudinary.com/dfghdeegs/image/upload/f_auto,q_auto:good/v1/stupidcms/site_bobby/team/kyymao2llfcpvgsdasrs?_a=BAMAOGWQ0",
+    "role": "CEO",
+    "company": "Bobby Inc.",
+    "linkedin": "",
+    "bio": "<p>Founder and CEO with 10+ years of experience.</p>",
+    "id": "8e7e0db8-7775-41c8-a47f-d3ca647075c2",
+    "created_at": "2026-03-24T03:08:34.433Z",
+    "updated_at": "2026-03-25T14:11:25.197Z"
+  },
+  {
+    "name": "Bobby Smith new version (copy)",
+    "slug": "bobby-smith-copy-eocr",
+    "image_url": "https://res.cloudinary.com/dfghdeegs/image/upload/f_auto,q_auto:good/v1/stupidcms/site_bobby/team/s0afuu7jh2a4f5omkc5x?_a=BAMAOGWQ0",
+    "role": "CEO",
+    "company": "Bobby Inc.",
+    "linkedin": "",
+    "bio": "<p>Founder and CEO with 10+ years of experience.</p>",
+    "id": "ce49ef8d-d204-4e54-86fc-e0dc7539195b",
+    "created_at": "2026-03-24T03:10:38.965Z"
+  },
+  {
+    "name": "Bobby Smith new version (copy)",
+    "slug": "bobby-smith-copy-lowu",
+    "image_url": "https://res.cloudinary.com/dfghdeegs/image/upload/f_auto,q_auto:good/v1/stupidcms/site_bobby/team/s0afuu7jh2a4f5omkc5x?_a=BAMAOGWQ0",
+    "role": "CEO",
+    "company": "Bobby Inc.",
+    "linkedin": "",
+    "bio": "<p>Founder and CEO with 10+ years of experience.</p>",
+    "id": "1d44ab20-ba8b-4e6d-a189-0dcbf55fb31c",
+    "created_at": "2026-03-24T03:16:15.444Z"
+  }
+]

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Posts — StupidCMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../styles/styles.css" />
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <div id="appNav"></div>
+  <script src="../../components/nav.js"></script>
+
+  <section class="uk-section">
+  <div class="uk-container">
+
+    <!-- Breadcrumbs -->
+    <nav class="uk-breadcrumbs mb-6">
+      <a href="dashboard.html" class="uk-breadcrumb-link">Dashboard</a>
+      <span class="uk-breadcrumb-sep">/</span>
+      <span class="uk-breadcrumb-current">Posts</span>
+    </nav>
+
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-xl font-semibold text-gray-900">Posts</h1>
+      <a href="editor.html?section=Posts" class="uk-button-primary">
+        + New Post
+      </a>
+    </div>
+
+    <!-- Posts list -->
+    <div id="postsList" class="uk-list"></div>
+
+  </div>
+  </section>
+
+  <script>
+    // Mock data — will come from API
+    const MOCK_POSTS = [
+      {
+        id: '1',
+        title: 'Why I Switched to a Standing Desk',
+        slug: 'why-i-switched-to-a-standing-desk',
+        author: 'Bobby',
+        date: '2026-03-20',
+        image_url: 'https://picsum.photos/seed/desk/800/400',
+        content: 'After years of back pain I finally made the switch...',
+      }
+    ];
+
+    function deletePost(id) {
+      if (!confirm('Delete this post?')) return;
+      // TODO: API call
+      window.showAlert('Delete connected to API coming next.');
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function renderPosts(posts) {
+      const list = document.getElementById('postsList');
+
+      if (!posts.length) {
+        list.innerHTML = `<p class="text-sm text-gray-400">No posts yet. Create your first one!</p>`;
+        return;
+      }
+
+      list.innerHTML = posts.map(post => `
+        <a href="editor.html?id=${post.id}" class="group uk-card cursor-pointer" style="display:flex;gap:1rem;align-items:center;">
+          <img src="${post.image_url}" alt="" class="uk-img-avatar" />
+          <div class="flex-1 min-w-0">
+            <h2 class="uk-text-headline truncate group-hover:text-blue-600 transition">${post.title}</h2>
+            <p class="uk-text-meta">
+              ${post.author} · ${formatDate(post.date)}
+              ${post.slug ? `<span class="ml-2 font-mono text-gray-300">/${post.slug}</span>` : ''}
+            </p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0" onclick="event.preventDefault()">
+            <button onclick="deletePost('${post.id}')" class="uk-button-delete">Delete</button>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    renderPosts(MOCK_POSTS);
+
+    // Update nav counts
+    const prevCounts = JSON.parse(localStorage.getItem('nav_counts') || '{}');
+    setNavCounts({ ...prevCounts, posts: MOCK_POSTS.length });
+  </script>
+</body>
+</html>

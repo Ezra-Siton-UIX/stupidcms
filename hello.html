@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello World</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 0 auto; padding: 2rem 1rem; color: #1a1a1a; }
+    h1 { font-size: 1.5rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.2rem; margin-bottom: 1rem; }
+    hr { border: 0; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+    section { margin-bottom: 2rem; }
+    .post { border-bottom: 1px solid #eee; padding: 1.5rem 0; }
+    .post:last-child { border-bottom: none; }
+    .post h2 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .post .date { font-size: 0.8rem; color: #999; margin-bottom: 0.75rem; }
+    .post img { width: 100%; border-radius: 8px; margin-bottom: 0.75rem; }
+    .post .content { font-size: 0.95rem; line-height: 1.6; color: #444; }
+    .group-heading { font-size: 1rem; font-weight: 600; color: #111; margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 2px solid #e5e7eb; }
+    .post-mini { padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+    .post-mini:last-child { border-bottom: none; }
+    .post-mini .meta { font-size: 0.78rem; color: #999; margin-top: 0.15rem; }
+    .team-member { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid #eee; }
+    .team-member:last-child { border-bottom: none; }
+    .team-member img { width: 72px; height: 72px; border-radius: 9999px; object-fit: cover; flex-shrink: 0; }
+    .team-member h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .team-meta { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; }
+    .team-bio { font-size: 0.95rem; line-height: 1.6; color: #444; }
+    .faq-item { padding: 1rem 0; border-bottom: 1px solid #eee; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .faq-item .answer { font-size: 0.95rem; line-height: 1.6; color: #444; }
+    #loading { color: #999; }
+  </style>
+</head>
+<body>
+  <div id="server-badge" style="display:inline-block;margin-bottom:1rem;padding:0.25rem 0.75rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:9999px;font-size:0.75rem;font-family:monospace;color:#475569;">
+    🖥 server: <span id="server-origin"></span>
+  </div>
+
+  <h1>Hello World — Bobby's Blog</h1>
+  <section>
+    <h2>Posts</h2>
+    <div id="posts"><p id="loading">Loading...</p></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Posts by Author</h2>
+    <div id="posts-by-author"></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Posts by Category</h2>
+    <div id="posts-by-category"></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Team</h2>
+    <div id="team"></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>FAQ</h2>
+    <div id="faq"></div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>FAQ by Category</h2>
+    <div id="faq-by-category"></div>
+  </section>
+
+
+  <div>
+    ## API Routes Overview
+
+### כללי
+- כל collection במערכת נגיש דרך API.
+- הנתונים נשמרים כ־JSON בתיקיית `server/data/<site>/`.
+- אין כרגע query params לפילטור, אלא ראוטים נפרדים.
+
+### קריאות זמינות לכל collection:
+
+#### רשימה כללית (public/private)
+- `GET /api/public/:site/:collection`
+- `GET /api/:site/:collection` (דורש הרשאה)
+
+#### רשימה לפי קטגוריה (public/private, רק לקולקשנים שתומכים בקטגוריות)
+- `GET /api/public/:site/:collection/by-category/:categoryId`
+- `GET /api/:site/:collection/by-category/:categoryId` (דורש הרשאה)
+
+#### דוגמה ל־posts:
+- `/api/public/site_bobby/posts`
+- `/api/public/site_bobby/posts/by-category/webflow`
+- `/api/site_bobby/posts`
+- `/api/site_bobby/posts/by-category/webflow`
+
+#### דוגמה ל־faq:
+- `/api/public/site_bobby/faq`
+- `/api/public/site_bobby/faq/by-category/loveable`
+- `/api/site_bobby/faq`
+- `/api/site_bobby/faq/by-category/loveable`
+
+#### הערות:
+- אין כרגע תמיכה ב־query params לפילטור, אלא רק ב־route יעודי.
+- כל route מחזיר מערך של אובייקטים מהקולקשן הרלוונטי.
+- routes פרטיים דורשים JWT.
+
+---
+
+**המלצה:**  
+להציג את הבלוק הזה (או דומה לו) תחת Developer debug בממשק הניהול, כדי שיהיה קל לראות מה זמין לכל collection.
+
+---
+
+אם תרצה שאוסיף קוד שמייצר את זה אוטומטית בממשק הניהול, שלח לי את קובץ ה־admin שבו מרנדרים את ה־Developer debug.
+
+  </div>
+  <script>
+    const SITE = 'site_bobby';
+    const API_BASE = '/api/public/' + SITE + '/';
+
+    document.getElementById('server-origin').textContent = window.location.origin;
+
+    function renderPosts(posts) {
+      const el = document.getElementById('posts');
+      if (!posts.length) {
+        el.innerHTML = '<p>No posts yet.</p>';
+        return;
+      }
+      el.innerHTML = posts.map(p =>
+        '<div class="post">' +
+          (p.image_url ? '<img src="' + p.image_url + '" alt="">' : '') +
+          '<h3>' + p.title + '</h3>' +
+          '<div class="date">' + (p.date || '') + '</div>' +
+          '<div class="content">' + (p.article_body || '') + '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    function renderGrouped(posts, groupKey, nameKey, containerId) {
+      const el = document.getElementById(containerId);
+      const groups = {};
+      posts.forEach(p => {
+        const key = p[groupKey] || 'unknown';
+        const name = p[nameKey] || key;
+        if (!groups[key]) groups[key] = { name, posts: [] };
+        groups[key].posts.push(p);
+      });
+      if (!Object.keys(groups).length) {
+        el.innerHTML = '<p>No posts yet.</p>';
+        return;
+      }
+      el.innerHTML = Object.values(groups).map(group =>
+        '<div style="margin-bottom:1.5rem">' +
+          '<div class="group-heading">' + group.name + ' (' + group.posts.length + ')</div>' +
+          group.posts.map(p =>
+            '<div class="post-mini">' +
+              '<strong>' + p.title + '</strong>' +
+              '<div class="meta">' + (p.date || '') + (p.author_name && groupKey !== 'author_id' ? ' · ' + p.author_name : '') + (p.category_name && groupKey !== 'category_id' ? ' · ' + p.category_name : '') + '</div>' +
+            '</div>'
+          ).join('') +
+        '</div>'
+      ).join('');
+    }
+
+    function renderTeam(team) {
+      const el = document.getElementById('team');
+      if (!team.length) {
+        el.innerHTML = '<p>No team members yet.</p>';
+        return;
+      }
+      el.innerHTML = team.map(member =>
+        '<div class="team-member">' +
+          (member.image_url ? '<img src="' + member.image_url + '" alt="">' : '') +
+          '<div>' +
+            '<h3>' + member.name + '</h3>' +
+            '<div class="team-meta">' + [member.role, member.company].filter(Boolean).join(' · ') + '</div>' +
+            '<div class="team-bio">' + (member.bio || '') + '</div>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    function renderFaq(items) {
+      const el = document.getElementById('faq');
+      if (!items.length) {
+        el.innerHTML = '<p>No FAQ items yet.</p>';
+        return;
+      }
+      el.innerHTML = items.map(item =>
+        '<div class="faq-item">' +
+          '<h3>' + item.question + '</h3>' +
+          '<div class="answer">' + (item.answer || '') + '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    function renderFaqByCategory(groups) {
+      const el = document.getElementById('faq-by-category');
+      const nonEmptyGroups = groups.filter(group => group.items && group.items.length);
+      if (!nonEmptyGroups.length) {
+        el.innerHTML = '<p>No FAQ categories with items yet.</p>';
+        return;
+      }
+      el.innerHTML = nonEmptyGroups.map(group =>
+        '<div style="margin-bottom:1.5rem">' +
+          '<div class="group-heading">' + group.name + ' (' + group.items.length + ')</div>' +
+          group.items.map(item =>
+            '<div class="faq-item">' +
+              '<h3>' + item.question + '</h3>' +
+              '<div class="answer">' + (item.answer || '') + '</div>' +
+            '</div>'
+          ).join('') +
+        '</div>'
+      ).join('');
+    }
+
+    Promise.all([
+      fetch(API_BASE + 'posts').then(r => r.json()),
+      fetch(API_BASE + 'team').then(r => r.json()),
+      fetch(API_BASE + 'faq').then(r => r.json()),
+      fetch(API_BASE + 'faq_categories').then(r => r.json()),
+    ])
+      .then(([posts, team, faq, faqCategories]) => {
+        return Promise.all(
+          faqCategories.map(category =>
+            fetch(API_BASE + 'faq/by-category/' + category.id)
+              .then(r => r.json())
+              .then(items => ({ id: category.id, name: category.name, slug: category.slug, items: items }))
+          )
+        ).then(faqByCategory => ({ posts, team, faq, faqByCategory }));
+      })
+      .then(({ posts, team, faq, faqByCategory }) => {
+        renderPosts(posts);
+        renderGrouped(posts, 'author_id', 'author_name', 'posts-by-author');
+        renderGrouped(posts, 'category_id', 'category_name', 'posts-by-category');
+        renderTeam(team);
+        renderFaq(faq);
+        renderFaqByCategory(faqByCategory);
+      })
+      .catch(() => {
+        document.getElementById('posts').innerHTML = '<p>Failed to load posts.</p>';
+        document.getElementById('team').innerHTML = '<p>Failed to load team.</p>';
+        document.getElementById('faq').innerHTML = '<p>Failed to load faq.</p>';
+        document.getElementById('faq-by-category').innerHTML = '<p>Failed to load faq by category.</p>';
+      });
+  </script>
+</body>
+</html>

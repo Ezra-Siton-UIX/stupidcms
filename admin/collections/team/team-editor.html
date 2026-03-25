@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Editor — StupidCMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../styles/styles.css" />
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <style>
+    .ql-toolbar { border-radius: 0.75rem 0.75rem 0 0 !important; border-color: #e5e7eb !important; }
+    .ql-container { border-radius: 0 0 0.75rem 0.75rem !important; border-color: #e5e7eb !important; font-size: 1rem; min-height: 220px; }
+    .ql-editor { min-height: 200px; line-height: 1.75; color: #374151; }
+    .ql-editor.ql-blank::before { color: #d1d5db; font-style: normal; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <div id="appNav"></div>
+  <script src="../../components/nav.js"></script>
+
+  <section class="uk-section">
+  <div class="uk-container space-y-6">
+
+    <!-- Breadcrumbs -->
+    <nav class="uk-breadcrumbs mb-6">
+      <a href="../blog/dashboard.html" class="uk-breadcrumb-link">Dashboard</a>
+      <span class="uk-breadcrumb-sep">/</span>
+      <a href="team.html" class="uk-breadcrumb-link" id="breadcrumbSection">Team</a>
+      <span class="uk-breadcrumb-sep">/</span>
+      <span id="breadcrumbTitle" class="uk-breadcrumb-current">New Member</span>
+    </nav>
+
+    <!-- Header buttons -->
+    <div class="flex items-center gap-2 mb-6" id="editorHeader">
+      <button id="cancelBtn" class="uk-button uk-button-secondary">Cancel</button>
+      <button id="saveBtn" class="uk-button-primary flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-white/0 transition-all duration-200" id="dirtyDot"></span>
+        <span id="saveBtnLabel">Save</span>
+      </button>
+    </div>
+
+    <!-- Name -->
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">
+        Name <span class="text-red-400 normal-case font-normal tracking-normal">*</span>
+      </label>
+      <input id="name" type="text"
+        class="w-full text-2xl font-semibold text-gray-900 bg-transparent border-b border-gray-200 pb-2 focus:outline-none focus:border-gray-900 transition"
+        placeholder="Full name..." />
+      <p id="nameError" class="text-xs text-red-400 mt-1 hidden">Name is required</p>
+    </div>
+
+    <!-- Slug -->
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">
+        Slug <span class="text-red-400 normal-case font-normal tracking-normal">*</span>
+      </label>
+      <div class="flex items-center gap-0 border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-gray-900 transition">
+        <span class="px-3 py-2 bg-gray-50 text-gray-400 text-sm font-mono border-r border-gray-200 select-none">/team/</span>
+        <input id="slug" type="text"
+          class="flex-1 px-3 py-2 text-sm font-mono text-gray-700 bg-white focus:outline-none"
+          placeholder="bobby-smith" />
+      </div>
+      <p id="slugError" class="text-xs text-red-400 mt-1 hidden">Slug is required</p>
+      <p class="text-xs text-gray-300 mt-1">lowercase, hyphens only — auto-generated from name</p>
+    </div>
+
+    <!-- Profile Image -->
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Profile Image</label>
+      <div class="flex items-start gap-4">
+        <div class="relative w-20 h-20 flex-shrink-0">
+          <img id="imagePreview" src="https://picsum.photos/seed/placeholder/200/200" alt="Preview"
+            class="w-20 h-20 object-cover rounded-2xl bg-gray-100 cursor-pointer"
+            onclick="document.getElementById('imageInput').click()" />
+          <div class="absolute inset-0 rounded-2xl bg-black/0 hover:bg-black/20 transition flex items-center justify-center cursor-pointer"
+            onclick="document.getElementById('imageInput').click()">
+            <span class="text-white text-xs opacity-0 hover:opacity-100">Change</span>
+          </div>
+          <input id="imageInput" type="file" accept="image/*" class="hidden" onchange="previewImage(event)" />
+        </div>
+        <input id="imageUrl" type="text"
+          class="flex-1 mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+          placeholder="Or paste image URL..."
+          oninput="previewUrl(this.value)" />
+      </div>
+    </div>
+
+    <!-- Role + Company -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Role</label>
+        <input id="role" type="text"
+          class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+          placeholder="CEO" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Company</label>
+        <input id="company" type="text"
+          class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+          placeholder="Acme Inc." />
+      </div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">LinkedIn</label>
+      <div class="flex items-center gap-0 border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-gray-900 transition">
+        <span class="px-3 py-2 bg-gray-50 text-gray-400 text-xs border-r border-gray-200 select-none">linkedin.com/in/</span>
+        <input id="linkedin" type="text"
+          class="flex-1 px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none"
+          placeholder="bobby-smith" />
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Bio</label>
+      <div id="quillEditor" class="bg-white"></div>
+    </div>
+
+  </div>
+  </section>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const memberId = params.get('id');
+
+    const MOCK_TEAM = {
+      '1': {
+        name: 'Bobby Smith',
+        slug: 'bobby-smith',
+        role: 'CEO',
+        company: 'Bobby Inc.',
+        linkedin: 'bobby-smith',
+        image_url: 'https://picsum.photos/seed/bobby/200/200',
+        bio: '<p>Founder and CEO with 10+ years of experience.</p>',
+      }
+    };
+
+    // Breadcrumb
+    if (memberId && MOCK_TEAM[memberId]) {
+      document.getElementById('breadcrumbTitle').textContent = MOCK_TEAM[memberId].name;
+    }
+
+    // Direction
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const siteDir = localStorage.getItem('site_dir_' + currentUser.site_id) || 'ltr';
+    ['name','slug','role','company','linkedin'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.dir = siteDir;
+    });
+
+    // Init Quill
+    const quill = new Quill('#quillEditor', {
+      theme: 'snow',
+      placeholder: 'Write a short bio...',
+      modules: {
+        toolbar: [
+          ['bold', 'italic'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['clean']
+        ]
+      }
+    });
+    quill.root.style.direction = siteDir;
+    quill.root.style.textAlign = siteDir === 'rtl' ? 'right' : 'left';
+
+    // Load if editing
+    if (memberId && MOCK_TEAM[memberId]) {
+      const m = MOCK_TEAM[memberId];
+      document.getElementById('name').value = m.name;
+      document.getElementById('slug').value = m.slug;
+      document.getElementById('role').value = m.role || '';
+      document.getElementById('company').value = m.company || '';
+      document.getElementById('linkedin').value = m.linkedin || '';
+      document.getElementById('imageUrl').value = m.image_url || '';
+      if (m.image_url) document.getElementById('imagePreview').src = m.image_url;
+      quill.root.innerHTML = m.bio || '';
+    }
+
+    // Auto-generate slug from name
+    document.getElementById('name').addEventListener('input', function () {
+      if (!memberId) { // only auto-generate for new entries
+        document.getElementById('slug').value = this.value
+          .toLowerCase().trim()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-');
+      }
+      markDirty();
+    });
+
+    // Dirty state
+    let isDirty = false;
+    const FIELDS = ['name','slug','role','company','linkedin','imageUrl'];
+
+    function markDirty() {
+      if (isDirty) return;
+      isDirty = true;
+      const btn = document.getElementById('saveBtn');
+      const dot = document.getElementById('dirtyDot');
+      const label = document.getElementById('saveBtnLabel');
+      dot.classList.replace('bg-white/0', 'bg-white/80');
+      label.textContent = 'Save changes';
+      btn.classList.replace('bg-blue-600', 'bg-blue-700');
+    }
+
+    function markClean() {
+      isDirty = false;
+      const btn = document.getElementById('saveBtn');
+      const dot = document.getElementById('dirtyDot');
+      const label = document.getElementById('saveBtnLabel');
+      dot.classList.replace('bg-white/80', 'bg-white/0');
+      label.textContent = 'Save';
+      btn.classList.replace('bg-blue-700', 'bg-blue-600');
+    }
+
+    FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', markDirty);
+    });
+    quill.on('text-change', markDirty);
+
+    function previewImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => { document.getElementById('imagePreview').src = ev.target.result; };
+      reader.readAsDataURL(file);
+      markDirty();
+    }
+
+    function previewUrl(url) {
+      if (url) document.getElementById('imagePreview').src = url;
+      markDirty();
+    }
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      window.location.href = 'team.html';
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const nameVal = document.getElementById('name').value.trim();
+      const slugVal = document.getElementById('slug').value.trim();
+
+      let valid = true;
+      if (!nameVal) { document.getElementById('nameError').classList.remove('hidden'); valid = false; }
+      else document.getElementById('nameError').classList.add('hidden');
+      if (!slugVal) { document.getElementById('slugError').classList.remove('hidden'); valid = false; }
+      else document.getElementById('slugError').classList.add('hidden');
+      if (!valid) return;
+
+      const btn = document.getElementById('saveBtn');
+      const label = document.getElementById('saveBtnLabel');
+      btn.disabled = true;
+      label.textContent = 'Saving...';
+
+      // TODO: GraphQL mutation
+      setTimeout(() => {
+        label.textContent = '✓ Saved';
+        btn.classList.replace('bg-blue-700', 'bg-green-600');
+        btn.classList.add('hover:bg-green-700');
+        markClean();
+        setTimeout(() => {
+          label.textContent = 'Save';
+          btn.classList.replace('bg-green-600', 'bg-blue-600');
+          btn.classList.remove('hover:bg-green-700');
+          btn.disabled = false;
+        }, 2000);
+      }, 600);
+    });
+  </script>
+</body>
+</html>

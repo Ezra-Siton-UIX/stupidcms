@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- What is CMS? 2025 -->
+  <url>
+    <loc>https://demo-bobby.example.com/faq/what-is-cms</loc>
+    <lastmod>2026-03-24T01:36:33.941Z</lastmod>
+  </url>
+  <!-- What is Webflow 2055 -->
+  <url>
+    <loc>https://demo-bobby.example.com/faq/what-is-webflow</loc>
+    <lastmod>2026-03-24T01:44:36.890Z</lastmod>
+  </url>
+</urlset>

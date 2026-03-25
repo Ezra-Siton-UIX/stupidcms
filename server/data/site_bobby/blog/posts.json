@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "title": "I miss Vasiliki Petrovo A lot heart ❤️",
+    "slug": "why-i-switched-to-a-standing-desk",
+    "author_id": "",
+    "author_name": "",
+    "category_id": "",
+    "category_name": "",
+    "article_date": "2026-03-20",
+    "image_url": "https://res.cloudinary.com/dfghdeegs/image/upload/v1774300539/stupidcms/site_bobby/posts/ynfb2rgbowzyvpm6xn8n.avif",
+    "article_body": "<p><strong>גכע</strong></p><p><em>דגע</em></p><p><img src=\"https://res.cloudinary.com/dfghdeegs/image/upload/f_auto,q_auto:good/v1/stupidcms/site_bobby/blog/posts/ijsv9hjxnz2pjagf1eip?_a=BAMAOGWQ0\"></p><p>דגכ</p>",
+    "created_at": "2026-03-20T10:00:00.000Z",
+    "updated_at": "2026-03-25T14:08:09.698Z",
+    "featured": true
+  },
+  {
+    "id": "98155d6c-846f-4158-b830-665cfaecee4d",
+    "title": "My New Post",
+    "slug": "my-new-post",
+    "author_id": "author_bobby",
+    "author_name": "Bobby",
+    "category_id": "category_updates",
+    "category_name": "Updates",
+    "article_date": "2026-03-23",
+    "image_url": "https://res.cloudinary.com/dfghdeegs/image/upload/v1774301243/stupidcms/site_bobby/posts/jzj2pzq6ze8mydz26h37.avif",
+    "article_body": "<p>This is a brand new post that just got added!</p>",
+    "created_at": "2026-03-23T20:02:58.599Z",
+    "updated_at": "2026-03-23T21:59:37.600Z"
+  },
+  {
+    "title": "hello category workspace 1",
+    "slug": "hello-category-workspace-1",
+    "article_date": "2026-03-19",
+    "author_id": "",
+    "category_id": "category_workspace",
+    "image_url": "",
+    "article_summary": "",
+    "article_body": "<p>hello</p>",
+    "featured": "",
+    "category_name": "Workspace",
+    "id": "3cfb5996-1673-4d05-b4e6-2712f543a3fc",
+    "created_at": "2026-03-24T11:50:56.821Z"
+  },
+  {
+    "title": "hello category workspace 2 (copy)",
+    "slug": "hello-category-workspace-2-copy",
+    "article_date": "2026-03-19",
+    "author_id": "",
+    "category_id": "category_workspace",
+    "image_url": "",
+    "article_summary": "",
+    "article_body": "<p>hello</p>",
+    "featured": "",
+    "id": "dda3e1aa-c37a-40df-aca7-67cd362ca2e1",
+    "created_at": "2026-03-24T11:51:07.660Z"
+  }
+]

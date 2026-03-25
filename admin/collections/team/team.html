@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team — StupidCMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../styles/styles.css" />
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <div id="appNav"></div>
+  <script src="../../components/nav.js"></script>
+
+  <section class="uk-section">
+  <div class="uk-container">
+
+    <!-- Breadcrumbs -->
+    <nav class="uk-breadcrumbs mb-6">
+      <a href="../blog/dashboard.html" class="uk-breadcrumb-link">Dashboard</a>
+      <span class="uk-breadcrumb-sep">/</span>
+      <span class="uk-breadcrumb-current">Team</span>
+    </nav>
+
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-xl font-semibold text-gray-900">Team Members</h1>
+      <a href="team-editor.html?section=Team" class="uk-button-primary">
+        + New Member
+      </a>
+    </div>
+
+    <!-- Team list -->
+    <div id="teamList" class="uk-list"></div>
+
+  </div>
+  </section>
+
+  <script>
+    // Mock data — will come from GraphQL
+    const MOCK_TEAM = [
+      {
+        id: '1',
+        name: 'Bobby Smith',
+        slug: 'bobby-smith',
+        role: 'CEO',
+        company: 'Bobby Inc.',
+        linkedin: 'https://linkedin.com/in/bobby',
+        image_url: 'https://picsum.photos/seed/bobby/200/200',
+      }
+    ];
+
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+    function deleteTeamMember(id) {
+      if (!confirm('Delete this team member?')) return;
+      // TODO: GraphQL mutation
+      window.showAlert('Delete connected to database coming next.');
+    }
+
+    function renderTeam(members) {
+      const list = document.getElementById('teamList');
+
+      if (!members.length) {
+        list.innerHTML = `<p class="text-sm text-gray-400">No team members yet.</p>`;
+        return;
+      }
+
+      list.innerHTML = members.map(m => `
+        <a href="team-editor.html?id=${m.id}" class="group uk-card cursor-pointer" style="display:flex;gap:1rem;align-items:center;">
+          <img src="${m.image_url || 'https://picsum.photos/seed/' + m.id + '/200/200'}" alt="" class="uk-img-avatar" />
+          <div class="flex-1 min-w-0">
+            <h2 class="uk-text-headline group-hover:text-blue-600 transition">${m.name}</h2>
+            <p class="uk-text-meta">
+              ${[m.role, m.company].filter(Boolean).join(' · ')}
+              ${m.slug ? `<span class="ml-2 font-mono text-gray-300">/${m.slug}</span>` : ''}
+            </p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0" onclick="event.preventDefault()">
+            <button onclick="deleteTeamMember('${m.id}')" class="uk-button-delete">Delete</button>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    // TODO: replace with GraphQL query getTeam(site_id)
+    renderTeam(MOCK_TEAM);
+
+    // Update nav counts
+    const prevCounts = JSON.parse(localStorage.getItem('nav_counts') || '{}');
+    setNavCounts({ ...prevCounts, team: MOCK_TEAM.length });
+  </script>
+</body>
+</html>

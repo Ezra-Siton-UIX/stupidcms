@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — StupidCMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../styles/styles.css" />
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <div id="appNav"></div>
+  <script src="../../components/nav.js"></script>
+
+  <section class="uk-section">
+  <div class="uk-container">
+
+    <!-- Welcome -->
+    <h1 class="text-xl font-semibold text-gray-900 mb-1" id="welcomeTitle">Welcome</h1>
+    <p class="text-sm text-gray-400 mb-10">Manage your website content</p>
+
+    <!-- Site Settings -->
+    <div>
+      <h2 class="text-xs font-medium text-gray-500 uppercase tracking-widest mb-4">Settings</h2>
+      <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-3">Content direction</label>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="dir" value="ltr" class="accent-blue-600" onchange="saveDir(this.value)" />
+            <span class="text-sm text-gray-700">LTR <span class="text-gray-400 text-xs">(English)</span></span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="dir" value="rtl" class="accent-blue-600" onchange="saveDir(this.value)" />
+            <span class="text-sm text-gray-700">RTL <span class="text-gray-400 text-xs">(עברית / ערבית)</span></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </section>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Personalize welcome
+    if (currentUser.username) {
+      document.getElementById('welcomeTitle').textContent = 'Welcome, ' + currentUser.username;
+    }
+
+    function saveDir(val) {
+      localStorage.setItem('site_dir_' + currentUser.site_id, val);
+    }
+
+    // Restore saved direction
+    const savedDir = localStorage.getItem('site_dir_' + currentUser.site_id) || 'ltr';
+    document.querySelectorAll('input[name="dir"]').forEach(r => {
+      if (r.value === savedDir) r.checked = true;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StupidCMS — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+
+  <div class="w-full max-w-sm">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-8 text-center tracking-tight">StupidCMS</h1>
+
+    <form id="loginForm" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+        <input
+          type="text"
+          id="username"
+          autocomplete="username"
+          class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+          placeholder="enter user name"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div class="relative">
+          <input
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            class="w-full px-3 py-2 pr-16 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+            placeholder="••••••••"
+            required
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-800"
+          >
+            show
+          </button>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-gray-600 select-none">
+        <input id="rememberMe" type="checkbox" class="rounded border-gray-300" checked />
+        Remember me
+      </label>
+
+      <p id="errorMsg" class="text-sm text-red-500 hidden">Login failed.</p>
+
+      <button
+        type="submit"
+        class="w-full bg-gray-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition"
+      >
+        Sign in
+      </button>
+
+      <p class="text-[11px] text-gray-400 text-center">
+        Server not running? From project root run: <span class="font-mono">npm start</span>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    function getStorageValue(key) {
+      return localStorage.getItem(key) || sessionStorage.getItem(key);
+    }
+
+    function getApiBase() {
+      const fromStorage = getStorageValue('api_base');
+      if (window.location.protocol === 'file:') return 'http://localhost:3003';
+      const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname || '');
+      if (isLocal) return window.location.origin;
+      if (fromStorage) return fromStorage;
+      return window.location.origin;
+    }
+
+    async function loginRequest(base, username, password) {
+      return fetch(base + '/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+    }
+
+    const form = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const rememberMeInput = document.getElementById('rememberMe');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const reveal = passwordInput.type === 'password';
+      passwordInput.type = reveal ? 'text' : 'password';
+      togglePasswordBtn.textContent = reveal ? 'hide' : 'show';
+    });
+
+    passwordInput.addEventListener('input', () => {
+      passwordInput.setCustomValidity('');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.classList.add('hidden');
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      if (!password.trim()) {
+        errorMsg.textContent = 'צריך להזין ססמה.';
+        errorMsg.classList.remove('hidden');
+        passwordInput.setCustomValidity('צריך להזין ססמה.');
+        passwordInput.reportValidity();
+        passwordInput.focus();
+        return;
+      }
+
+      passwordInput.setCustomValidity('');
+
+      try {
+        const primaryBase = getApiBase();
+        let usedBase = primaryBase;
+        let res = await loginRequest(primaryBase, username, password);
+
+        // If running from file:// or another local server, fallback to the dedicated local API port.
+        if (!res.ok && (res.status === 404 || res.status === 0) && primaryBase !== 'http://localhost:3003') {
+          usedBase = 'http://localhost:3003';
+          res = await loginRequest(usedBase, username, password);
+        }
+        
+        if (!res.ok) {
+          if (res.status === 401) {
+            errorMsg.textContent = 'Invalid username or password.';
+          } else {
+            errorMsg.textContent = 'Cannot reach API server. Run npm start from project root and try again.';
+          }
+          errorMsg.classList.remove('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        const targetStorage = rememberMeInput.checked ? localStorage : sessionStorage;
+        const otherStorage = rememberMeInput.checked ? sessionStorage : localStorage;
+
+        // Keep auth/session keys in one storage only.
+        ['api_base', 'token', 'user', 'site_id'].forEach(k => otherStorage.removeItem(k));
+
+        targetStorage.setItem('api_base', usedBase);
+        targetStorage.setItem('token', data.token);
+        targetStorage.setItem('user', JSON.stringify({ username: data.username, site_id: data.site_id }));
+        targetStorage.setItem('site_id', data.site_id);
+
+        // Always navigate to the app host that served/authenticated the API.
+        window.location.href = usedBase + '/admin/index.html';
+      } catch (err) {
+        console.error(err);
+        errorMsg.textContent = 'Cannot reach API server. Run npm start from project root and try again.';
+        errorMsg.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
