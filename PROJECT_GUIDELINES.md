@@ -177,6 +177,11 @@ All field types available for collection schemas. Defined in `admin/app/collecti
 3. Keep data access patterns simple so the storage layer can later be swapped if needed
 4. Future option: evaluate an external database/data source only if it provides real operational value, for example MongoDB; any such integration will be implementation-specific to that system
 
+## Deployment Notes
+- Railway-specific deployment notes live in `RAILWAY.md` at the repo root.
+- Current repo wiring includes a root `package.json`, `railway.toml`, and local `PORT=3001` in `server/.env` for development.
+- If Railway deployment behavior changes later, update `RAILWAY.md` first so operational notes stay in one place.
+
 ## Beta Workflow
 - Before production launch, use a dedicated `beta` folder/environment as the realistic integration surface for lists and content flows.
 - In practice, this `beta` layer should behave like the product-facing version of the system before go-live, so testing there should reflect how the real product will communicate and behave.

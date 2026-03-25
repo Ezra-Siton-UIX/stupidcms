@@ -1,0 +1,37 @@
+# ──────────────────────────────────────────────────────────
+# railway.toml — Railway deployment configuration
+# Docs: https://docs.railway.app/reference/config-as-code
+# ──────────────────────────────────────────────────────────
+#
+# HOW RAILWAY WORKS (the short version):
+#   1. You connect your GitHub repo to Railway
+#   2. Every time you push to main, Railway:
+#      a. Clones the repo
+#      b. Runs the BUILD phase  (install dependencies)
+#      c. Runs the START phase  (launches the server)
+#   3. Railway gives you a public URL (e.g. stupidcms.up.railway.app)
+#
+# IMPORTANT: Railway sets the PORT environment variable automatically.
+#   Your server already reads process.env.PORT — so that's covered.
+#
+# ──────────────────────────────────────────────────────────
+
+[build]
+# Railway uses Nixpacks to auto-detect Node.js.
+# It reads the root package.json, runs "npm install",
+# which triggers "postinstall" → installs /server deps too.
+builder = "NIXPACKS"
+
+[deploy]
+# This is the command Railway runs to start your app.
+# It runs from the repo ROOT, so we point to server/server.js.
+startCommand = "node server/server.js"
+
+# Health check — Railway pings this URL to know the app is alive.
+# If it doesn't respond within the timeout, Railway restarts the app.
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+
+# Auto-restart if the server crashes.
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

@@ -1,0 +1,16 @@
+{
+  "name": "stupidcms",
+  "version": "1.0.0",
+  "description": "StupidCMS — Root package for Railway deployment",
+  "private": true,
+
+  "scripts": {
+    "postinstall": "npm install --prefix server",
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
