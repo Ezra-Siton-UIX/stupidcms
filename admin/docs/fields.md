@@ -4,21 +4,25 @@ This file explains how to add and manage fields in the CMS using the schema sour
 
 ## Where to edit
 
-Edit collection schemas in:
+Each collection schema lives in its own file under:
+- `admin/app/collections/<collection_name>.js`
+
+Core setup (build helpers, field registry, site domains):
 - `admin/app/collections.js`
 
-Edit per-site domain mapping in the same file:
-- `window.SITE_DOMAINS`
+Schema validation + final build:
+- `admin/app/collections-init.js`
 
-Main object:
-- `window.COLLECTION_SCHEMAS`
+Per-site domain mapping:
+- `window.SITE_DOMAINS` in `admin/app/collections.js`
 
-Generated runtime config:
-- `window.COLLECTIONS` (auto-built from schemas)
+Runtime objects (auto-built, do not edit directly):
+- `window.COLLECTION_SCHEMAS` — populated by individual schema files
+- `window.COLLECTIONS` — built by `collections-init.js`
 
 ## Source of truth model
 
-Each collection schema includes:
+Each collection schema file (e.g. `admin/app/collections/posts.js`) includes:
 - `primary`: the main field (title/name/question)
 - `slugPrefix`: slug base path
 - `extraFields`: all additional fields for that collection
@@ -27,21 +31,52 @@ Common fields are auto-generated for every collection:
 - Primary field (required)
 - `slug` field (required, autoFrom primary)
 
-This means you no longer repeat name/title + slug manually in every collection.
-Domain is also centralized there (developer-controlled), so clients cannot break site links.
+This means you never repeat name/title + slug manually in every collection.
+Domain is also centralized (developer-controlled), so clients cannot break site links.
 
-## Basic field types (currently supported)
+## How to add a new collection
 
-- `title`
-- `text`
-- `slug`
-- `prefixed`
-- `image`
-- `richtext`
+1. Create `admin/app/collections/my_collection.js` with:
+   ```js
+   window.COLLECTION_SCHEMAS.my_collection = { key: 'my_collection', ... };
+   ```
+2. Add `await load('app/collections/my_collection.js?v=' + build);` to the boot loader in `admin/index.html` (before `collections-init.js`)
+3. Add matching server data file if needed
 
-Useful flags:
-- `required: true` -> validates on save and shows required marker in editor
-- `half: true` -> two fields can share one row
+## All field types (current)
+
+Defined in `FIELD_TYPE_REGISTRY` in `admin/app/collections.js`.
+Rendered by `admin/app/components/FormFields.js`.
+
+### Core fields (auto-generated per collection)
+- `title` — Primary text field (large, bold). One per collection. Props: `placeholder`.
+- `slug` — URL-safe identifier. Auto-generated from title. Props: `prefix`, `autoFrom`, `disabled`, `disabledNote`.
+
+### Text fields
+- `text` — Single-line input. Props: `placeholder`, `maxLength`, `half`.
+- `textarea` — Multi-line plain text. Props: `placeholder`, `maxLength`, `rows`, `half`.
+- `email` — Email input with validation. Props: `placeholder`, `half`.
+- `phone` — Phone input. Props: `placeholder`, `half`.
+- `number` — Number input. Props: `placeholder`, `min`, `max`, `step`, `half`.
+- `prefixed` — Text with visible prefix. Props: `prefix`, `placeholder`, `half`.
+
+### Selection fields
+- `reference` — Links to another collection. Props: `sourceCollection` (required), `labelKey`, `mirrorKey`, `placeholder`, `half`.
+- `select` — Dropdown from fixed options. Props: `options` (required), `placeholder`, `half`.
+- `checkbox` — Boolean toggle. Props: `checkboxLabel`.
+- `radio` — Radio group. Props: `options` (required).
+
+### Media fields
+- `image` — Cloudinary upload with drag-drop. Props: `previewMode`, `imageSize`.
+- `video` — Video embed URL. Props: `placeholder`.
+
+### Rich text
+- `richtext` — Quill editor. Props: `placeholder`, `toolbar` (`full` or `minimal`).
+
+### Other
+- `date` — Date picker. Props: `half`.
+- `link` / `url` — URL input with validation. Props: `placeholder`, `half`.
+- `color` — Color picker. Props: `placeholder`, `half`.
 
 ## Add a regular text field
 
@@ -72,21 +107,17 @@ Example inside `extraFields`:
 
 ## Example: adding a new field to Posts
 
-In `COLLECTION_SCHEMAS.posts.extraFields`, add:
+In `admin/app/collections/posts.js`, find the `extraFields` array and add:
 
 ```js
 { key: 'reading_time', label: 'Reading Time', type: 'text', placeholder: '5 min' }
 ```
 
-That is it. Save and reload admin.
+Save and reload admin.
 
-## About future field types
+## Adding new field types
 
-Common future needs:
-- Number field
-- Radio/select field
-- Checkbox/toggle field
-
-When needed, extend `renderField` in `admin/app/components/FormFields.js` with new `case` blocks and use the same schema approach.
-
-For now, keep it simple with existing types.
+To add a new field type:
+1. Add the type to `FIELD_TYPE_REGISTRY` in `admin/app/collections.js`
+2. Add a `case` block in `renderField` in `admin/app/components/FormFields.js`
+3. Use the same schema-driven approach as existing types

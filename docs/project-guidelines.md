@@ -27,7 +27,7 @@ Sites: name, owner_id
 Posts: title, content, image_url, author, date, site_id
 ```
 - This block is a simplified conceptual example.
-- The full live model is schema-driven per collection and defined in `admin/app/collections.js`.
+- The full live model is schema-driven per collection. Each schema lives in its own file under `admin/app/collections/`.
 
 ## Authentication Model
 - Each user login → JWT token

@@ -1,0 +1,22 @@
+window.COLLECTION_SCHEMAS.faq_categories = {
+  key: 'faq_categories',
+  label: 'Categories',
+  singular: 'Category',
+  newLabel: '+ New Category',
+  emptyMessage: 'No FAQ categories yet.',
+  navGroup: 'faq',
+  navGroupLabel: 'FAQ',
+  navVisible: true,
+  navSecondary: true,
+  navOrder: 55,
+  primary: { key: 'name', label: 'Category Name', placeholder: 'Webflow' },
+  hasSinglePage: false,
+  slugPrefix: '/faq/category/',
+  metadataNote: 'FAQ categories help organize questions into clear topics such as Webflow or Loveable.',
+  list: {
+    image: null,
+    placeholder: '?',
+    subtitle: function () { return ''; },
+  },
+  extraFields: [],
+};

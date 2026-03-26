@@ -1,0 +1,22 @@
+window.COLLECTION_SCHEMAS.services_categories = {
+  key: 'services_categories',
+  label: 'Categories',
+  singular: 'Category',
+  newLabel: '+ New Category',
+  emptyMessage: 'No service categories yet.',
+  navGroup: 'services',
+  navGroupLabel: 'Services',
+  navVisible: true,
+  navSecondary: true,
+  navOrder: 36,
+  primary: { key: 'name', label: 'Category Name', placeholder: 'Consulting' },
+  hasSinglePage: false,
+  slugPrefix: '/services/category/',
+  metadataNote: 'Service categories help organize services into reusable groups.',
+  list: {
+    image: null,
+    placeholder: '#',
+    subtitle: function () { return ''; },
+  },
+  extraFields: [],
+};

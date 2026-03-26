@@ -35,7 +35,25 @@
           console.error('[Babel Error in ' + url + ']', err.message);
         }
       }
+      // Core setup (API_BASE, build helpers, field registry)
       await load('app/collections.js?v=test');
+      // Collection schemas
+      await load('app/collections/posts.js?v=test');
+      await load('app/collections/blog_authors.js?v=test');
+      await load('app/collections/blog_categories.js?v=test');
+      await load('app/collections/media.js?v=test');
+      await load('app/collections/media_publishers.js?v=test');
+      await load('app/collections/services.js?v=test');
+      await load('app/collections/services_categories.js?v=test');
+      await load('app/collections/team.js?v=test');
+      await load('app/collections/team_categories.js?v=test');
+      await load('app/collections/faq.js?v=test');
+      await load('app/collections/faq_categories.js?v=test');
+      await load('app/collections/portfolio.js?v=test');
+      await load('app/collections/portfolio_categories.js?v=test');
+      await load('app/collections/legal.js?v=test');
+      // Build final COLLECTIONS object
+      await load('app/collections-init.js?v=test');
       await load('app/helpers.js?v=test');
       await load('app/components/OutlineIcon.js?v=test');
       await load('app/components/ToastContainer.js?v=test');
