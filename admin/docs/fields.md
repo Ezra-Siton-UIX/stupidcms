@@ -87,6 +87,6 @@ Common future needs:
 - Radio/select field
 - Checkbox/toggle field
 
-When needed, extend `renderField` in `admin/app/components.js` with new `case` blocks and use the same schema approach.
+When needed, extend `renderField` in `admin/app/components/FormFields.js` with new `case` blocks and use the same schema approach.
 
 For now, keep it simple with existing types.

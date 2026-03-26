@@ -1,6 +1,5 @@
-// Shared navigation component — edit here, affects all pages.
-
-(function () {
+// Shared navigation component — moved from admin/components/nav.js
+window.Nav = function Nav() {
   const TABS = [
     { label: 'Posts', href: '../blog/blog.html',  countKey: 'posts' },
     { label: 'Team',  href: '../team/team.html',  countKey: 'team'  },
@@ -44,35 +43,20 @@
       : `<a href="${t.href}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-700 transition whitespace-nowrap">${t.label} ${countBadge(t.countKey, false)}</a>`;
   }).join('');
 
-  const html = `
-    <header class="uk-header">
-      <div class="uk-container" style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;padding-bottom:1rem;">
-        <a href="${dashboardLink}" class="text-sm font-semibold text-gray-900 tracking-tight hover:text-blue-600 transition" style="text-decoration:none;">StupidCMS</a>
-        <div style="display:flex;align-items:center;gap:1rem;">
-          <span class="text-sm text-gray-500">${username}</span>
-          <button onclick="navLogout()" class="text-sm text-gray-400 hover:text-gray-900 transition" style="background:none;border:none;cursor:pointer;">Sign out</button>
+  return (
+    <>
+      <header className="uk-header">
+        <div className="uk-container" style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'1rem',paddingBottom:'1rem'}}>
+          <a href={dashboardLink} className="text-sm font-semibold text-gray-900 tracking-tight hover:text-blue-600 transition" style={{textDecoration:'none'}}>StupidCMS</a>
+          <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+            <span className="text-sm text-gray-500">{username}</span>
+            <button onClick={navLogout} className="text-sm text-gray-400 hover:text-gray-900 transition" style={{background:'none',border:'none',cursor:'pointer'}}>Sign out</button>
+          </div>
         </div>
+      </header>
+      <div className="uk-container">
+        <div style={{display:'flex',gap:'0.25rem',borderBottom:'1px solid #f3f4f6'}} dangerouslySetInnerHTML={{__html: tabsHtml}} />
       </div>
-    </header>
-
-    <div class="uk-container">
-      <div style="display:flex;gap:0.25rem;border-bottom:1px solid #f3f4f6;">
-        ${tabsHtml}
-      </div>
-    </div>
-  `;
-
-  const target = document.getElementById('appNav');
-  if (target) target.innerHTML = html;
-
-  window.navLogout = function () {
-    if (!window.showConfirm('Are you sure you want to sign out?')) return;
-    localStorage.clear();
-    window.location.href = '../../login.html';
-  };
-
-  // Helper: update counts from anywhere (call after data loads)
-  window.setNavCounts = function (obj) {
-    localStorage.setItem('nav_counts', JSON.stringify(obj));
-  };
-})();
+    </>
+  );
+};

@@ -41,14 +41,34 @@
     (async function boot() {
       async function load(url) {
         var code = await (await fetch(url)).text();
-        var out = Babel.transform(code, { presets: ['react'] }).code;
-        var s = document.createElement('script');
-        s.textContent = out;
-        document.body.appendChild(s);
+        try {
+          var out = Babel.transform(code, {
+            presets: ['env', 'react'],
+            filename: url,
+            sourceMaps: 'inline'
+          }).code;
+          out += '\n//# sourceURL=' + url;
+          var s = document.createElement('script');
+          s.textContent = out;
+          document.body.appendChild(s);
+        } catch (err) {
+          console.error('[Babel Error in ' + url + ']', err.message);
+        }
       }
       var build = encodeURIComponent(window.APP_BUILD);
       await load('app/collections.js?v=' + build);
-      await load('app/components.js?v=' + build);
+      await load('app/helpers.js?v=' + build);
+      // Components — order matters (dependencies first)
+      await load('app/components/OutlineIcon.js?v=' + build);
+      await load('app/components/ToastContainer.js?v=' + build);
+      await load('app/components/AlertBox.js?v=' + build);
+      await load('app/components/Breadcrumbs.js?v=' + build);
+      await load('app/components/BackendWarning.js?v=' + build);
+      await load('app/components/Layout.js?v=' + build);
+      await load('app/components/QuillEditor.js?v=' + build);
+      await load('app/components/FormFields.js?v=' + build);
+      await load('app/components/ListPage.js?v=' + build);
+      await load('app/components/EditorPage.js?v=' + build);
       await load('app/App.js?v=' + build);
     })();
   </script>
