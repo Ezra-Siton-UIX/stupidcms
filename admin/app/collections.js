@@ -63,8 +63,8 @@ function buildCommonFields(schema) {
       prefix: schema.slugPrefix,
       autoFrom: primary.key,
       required: hasSinglePage,
-      disabled: !hasSinglePage,
-      disabledNote: hasSinglePage ? '' : 'This collection does not use internal single-page URLs. Use external links fields instead when relevant.',
+      disabled: false,
+      disabledNote: '',
     },
   ];
 }

@@ -1,7 +1,7 @@
 // FormFields — renderField / renderFields
 // renderFields + renderField — renders all field types in the editor
 
-function renderFields(fields, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields) {
+function renderFields(fields, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields, initialData) {
   const out = [];
   let i = 0;
   while (i < fields.length) {
@@ -9,20 +9,20 @@ function renderFields(fields, data, errors, siteDir, updateField, onFieldBlur, d
     if (f.half && i + 1 < fields.length && fields[i + 1].half) {
       out.push(
         <div key={'grid-' + i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          {renderField(fields[i], data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields)}
-          {renderField(fields[i + 1], data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields)}
+          {renderField(fields[i], data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields, initialData)}
+          {renderField(fields[i + 1], data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields, initialData)}
         </div>
       );
       i += 2;
     } else {
-      out.push(renderField(f, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields));
+      out.push(renderField(f, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields, initialData));
       i++;
     }
   }
   return out;
 }
 
-function renderField(field, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields) {
+function renderField(field, data, errors, siteDir, updateField, onFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, changedFields, initialData) {
   const val = data[field.key] || '';
   const err = errors[field.key];
   const isChangedField = !!(changedFields && changedFields.has(field.key));
@@ -205,6 +205,11 @@ function renderField(field, data, errors, siteDir, updateField, onFieldBlur, dom
             />
           </div>
           {err && <p style={{ fontSize: '0.75rem', color: '#f87171', marginTop: '0.25rem' }}>{err}</p>}
+          {!err && initialData && initialData[field.key] && val !== initialData[field.key] && (
+            <p style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '0.25rem', fontWeight: 500 }}>
+              ⚠ Slug changed — the old URL will 404 on the live site. No redirects exist.
+            </p>
+          )}
               <p style={{ fontSize: '0.75rem', color: '#d1d5db', marginTop: '0.25rem' }}>
                 {field.disabled ? (field.disabledNote || 'This URL is disabled for this collection.') : ('lowercase, hyphens only — auto-generated from ' + field.autoFrom)}
               </p>

@@ -122,13 +122,16 @@ function buildBreadcrumbs(route) {
 // ─── Dev Server Card (localhost only) ────────────────────
 function DevServerCard() {
   const [copied, setCopied] = useAppState(false);
-  const [serverStatus, setServerStatus] = useAppState('checking'); // 'checking' | 'ok' | 'offline'
+  const [serverStatus, setServerStatus] = useAppState('checking');
+  const [cloudinaryOk, setCloudinaryOk] = useAppState(null);
   const command = 'npm start';
 
   useAppEffect(() => {
     let active = true;
     window.resolveBackendStatus().then(status => {
-      if (active) setServerStatus(status.status === 'ok' ? 'ok' : 'offline');
+      if (!active) return;
+      setServerStatus(status.status === 'ok' ? 'ok' : 'offline');
+      if (status.payload && status.payload.cloudinary != null) setCloudinaryOk(status.payload.cloudinary);
     });
     return () => { active = false; };
   }, []);
@@ -151,20 +154,27 @@ function DevServerCard() {
 
   return (
     <div>
-      <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>Developer</h2>
+      <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>Admin Localhost</h2>
       <div style={{ background: cardBg, border: '1px solid ' + cardBorder, borderRadius: '1rem', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
 
         {/* Status badge */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
           <p className="text-sm font-medium text-gray-700">🖥 Local server</p>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, color: statusDot.color }}>
-            <span style={{
-              width: '8px', height: '8px', borderRadius: '50%',
-              background: statusDot.color,
-              boxShadow: serverStatus === 'ok' ? '0 0 0 3px #bbf7d0' : 'none',
-            }} />
-            {statusDot.label}
-          </span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+            {cloudinaryOk != null && (
+              <span style={{ fontSize: '0.65rem', fontWeight: 600, color: cloudinaryOk ? '#16a34a' : '#dc2626', background: cloudinaryOk ? '#f0fdf4' : '#fef2f2', border: '1px solid ' + (cloudinaryOk ? '#bbf7d0' : '#fecaca'), borderRadius: '0.25rem', padding: '0.1rem 0.35rem' }}>
+                {cloudinaryOk ? '☁ Cloudinary' : '☁ Cloudinary ✗'}
+              </span>
+            )}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 600, color: statusDot.color }}>
+              <span style={{
+                width: '8px', height: '8px', borderRadius: '50%',
+                background: statusDot.color,
+                boxShadow: serverStatus === 'ok' ? '0 0 0 3px #bbf7d0' : 'none',
+              }} />
+              {statusDot.label}
+            </span>
+          </div>
         </div>
 
         <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.75rem' }}>
@@ -202,11 +212,28 @@ function DevServerCard() {
             {copied ? '✓ Copied' : 'Copy'}
           </button>
         </div>
-        {serverStatus === 'ok' && (
+        {serverStatus === 'ok' && (<>
           <p style={{ fontSize: '0.72rem', color: '#16a34a', marginTop: '0.6rem', fontWeight: 500 }}>
             ✓ Server is running. Use npm run dev for auto-restart during development.
           </p>
-        )}
+          <a
+            href="http://localhost:3000/admin/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginTop: '0.6rem', marginBottom: '0.5rem', textDecoration: 'underline' }}
+          >
+            localhost:3000/admin/index.html
+          </a>
+          <a
+            href="http://localhost:3000/admin/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="uk-button uk-button-secondary"
+            style={{ textDecoration: 'none', display: 'inline-block' }}
+          >
+            Open local admin ↗
+          </a>
+        </>)}
         {serverStatus === 'offline' && (
           <p style={{ fontSize: '0.72rem', color: '#dc2626', marginTop: '0.6rem', fontWeight: 500 }}>
             ✗ Server not detected. Run the command above, then refresh.
@@ -224,12 +251,10 @@ function DevServerCard() {
 function DashboardPage() {
   const user = JSON.parse(getStorageValue('user') || '{}');
   const siteId = getStorageValue('site_id') || 'site_bobby';
-  const domain = window.getSiteDomain(siteId);
   const initialDir = localStorage.getItem('site_dir_' + siteId) || 'ltr';
   const [dir, setDir] = useAppState(initialDir);
   const [savedDir, setSavedDir] = useAppState(initialDir);
   const [showId, setShowId] = useAppState(false);
-  const [copyState, setCopyState] = useAppState('idle');
   const [showLogoutConfirm, setShowLogoutConfirm] = useAppState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useAppState(false);
   const [pendingNavigation, setPendingNavigation] = useAppState(null);
@@ -273,18 +298,6 @@ function DashboardPage() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [isDirty]);
 
-
-  async function copyDomain() {
-    if (!domain) return;
-    try {
-      await navigator.clipboard.writeText(domain);
-      setCopyState('copied');
-      setTimeout(() => setCopyState('idle'), 1400);
-    } catch {
-      setCopyState('failed');
-      setTimeout(() => setCopyState('idle'), 1800);
-    }
-  }
 
   return (
     <div>
@@ -345,47 +358,53 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Domain */}
-        <div>
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>Site</h2>
-          <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: '1rem', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <label className="block text-sm font-medium text-gray-700" style={{ marginBottom: '0.5rem' }}>Domain</label>
-            <input type="text" value={domain} readOnly className="uk-input" style={{ background: '#f9fafb', color: '#6b7280' }} />
-            <p style={{ fontSize: '0.75rem', color: '#d1d5db', marginTop: '0.25rem' }}>
-              Defined by developer in config. Clients cannot change this.
-            </p>
-            {domain && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
-                <a
-                  href={domain}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="uk-button uk-button-secondary"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Open site ↗
-                </a>
-                <button onClick={copyDomain} className="uk-button uk-button-secondary">
-                  {copyState === 'copied' ? 'Copied' : copyState === 'failed' ? 'Copy failed' : 'Copy domain'}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Dev: Start server command (localhost only) */}
         {isLocalHostName(window.location.hostname) && <DevServerCard />}
+
+        {/* Production link */}
+        <div>
+          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>Admin Production</h2>
+          <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: '1rem', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <p className="text-sm font-medium text-gray-700" style={{ marginBottom: '0.35rem' }}>Railway — Live</p>
+            <a
+              href="https://stupidcms-production.up.railway.app/admin/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginBottom: '0.75rem', textDecoration: 'underline' }}
+            >
+              stupidcms-production.up.railway.app/admin/index.html
+            </a>
+            <a
+              href="https://stupidcms-production.up.railway.app/admin/index.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="uk-button uk-button-secondary"
+              style={{ textDecoration: 'none' }}
+            >
+              Open production ↗
+            </a>
+          </div>
+        </div>
 
         {/* API Meta — quick link to self-documenting API contract */}
         <div>
           <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>API</h2>
           <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: '1rem', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <label className="block text-sm font-medium text-gray-700" style={{ marginBottom: '0.35rem' }}>Public API</label>
-            <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.75rem' }}>
+            <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.5rem' }}>
               Self-documenting endpoint — lists all collections, routes, and examples.
             </p>
             <a
-              href={window.API_BASE + '/meta'}
+              href={window.API_BASE + '/api/meta'}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginBottom: '0.75rem', textDecoration: 'underline' }}
+            >
+              {window.API_BASE}/api/meta
+            </a>
+            <a
+              href={window.API_BASE + '/api/meta'}
               target="_blank"
               rel="noopener noreferrer"
               className="uk-button uk-button-secondary"

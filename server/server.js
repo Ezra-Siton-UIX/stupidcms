@@ -191,12 +191,15 @@ app.post('/api/login', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
+  const cfg = cloudinary.config();
+  const cloudinaryOk = !!(cfg.cloud_name && cfg.api_key && cfg.api_secret);
   res.json({
     ok: true,
     build: SERVER_BUILD,
     port: String(process.env.PORT || 3000),
     supportsUploads: true,
     supportsBlogRelations: true,
+    cloudinary: cloudinaryOk,
   });
 });
 

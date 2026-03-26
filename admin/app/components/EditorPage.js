@@ -297,6 +297,7 @@ window.EditorPage = function EditorPage({ collection, itemId }) {
         if (isDuplicateDraft) {
           const savedTitle = saved[config.list.title] || config.singular;
           window.showToast('"' + savedTitle + '" duplicated successfully', 'success');
+          setTimeout(() => window.showToast('Slug was auto-generated — update it to avoid a 404 on the live site', 'warning'), 600);
         } else {
           window.showToast('Item created successfully', 'success');
         }
@@ -559,7 +560,7 @@ window.EditorPage = function EditorPage({ collection, itemId }) {
       )}
 
       {/* Fields */}
-      {renderFields(config.fields, data, errors, siteDir, updateField, handleFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, restoreChangedFields)}
+      {renderFields(config.fields, data, errors, siteDir, updateField, handleFieldBlur, domain, collection, uploadState, setUploadState, referenceOptions, restoreChangedFields, isNew ? null : initialDataRef.current)}
 
       {/* Bottom action bar */}
       <div className="uk-editor-actions-bottom">

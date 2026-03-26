@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "description": "StupidCMS — Root package for Railway deployment",
   "private": true,
-
   "scripts": {
     "postinstall": "npm install --prefix server",
     "start": "node server/server.js",
-    "dev": "node --watch server/server.js"
+    "dev": "node --watch server/server.js",
+    "watch": "browser-sync start --proxy localhost:3000 --files 'admin/**/*' --no-notify --startPath /admin/index.html"
   },
-
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4"
   }
 }

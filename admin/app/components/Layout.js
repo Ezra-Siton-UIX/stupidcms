@@ -20,6 +20,12 @@ window.Layout = function Layout({ activeTab, breadcrumbs, children }) {
               <circle cx="19" cy="14" r="1.5" fill="#2563eb" />
             </svg>
             StupidCMS
+            <span style={{ marginLeft: '0.35rem', fontSize: '0.5rem', fontWeight: 600, color: '#fff', background: isLocalHostName(window.location.hostname) ? '#f97316' : '#16a34a', borderRadius: '0.2rem', padding: '0.08rem 0.28rem', letterSpacing: '0.04em', verticalAlign: 'middle', opacity: 0.8 }}>
+              {isLocalHostName(window.location.hostname) ? 'LOCAL' : 'LIVE'}
+            </span>
+            {window.location.port === '3001' && (
+              <span style={{ marginLeft: '0.2rem', fontSize: '0.5rem', fontWeight: 700, color: '#f97316', verticalAlign: 'middle', opacity: 0.7 }}>W</span>
+            )}
           </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span className="text-sm text-gray-500">{username}</span>
