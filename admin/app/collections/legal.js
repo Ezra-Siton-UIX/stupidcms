@@ -1,3 +1,4 @@
+// Fields: name (primary) | article_date, body, accessibility_contact_name, accessibility_contact_phone, accessibility_contact_email
 window.COLLECTION_SCHEMAS.legal = {
   key: 'legal',
   label: 'Legal',

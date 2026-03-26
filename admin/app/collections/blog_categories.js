@@ -1,3 +1,4 @@
+// Fields: name (primary)
 window.COLLECTION_SCHEMAS.blog_categories = {
   key: 'blog_categories',
   label: 'Categories',

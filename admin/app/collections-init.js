@@ -1,5 +1,11 @@
-// collections-init.js — Validates schemas and builds final COLLECTIONS object.
+// collections-init.js — CollectionsEngine Boot Step
+//
 // Runs AFTER collections.js + all collections/*.js schema files are loaded.
+// Responsibilities:
+//   - Validates each schema's extraFields against FIELD_TYPE_REGISTRY
+//   - Calls buildCollection() on each schema
+//   - Writes the final window.COLLECTIONS object
+//   - window.COLLECTIONS is what App.js (the router) reads to render the UI
 
 (function validateSchemas() {
   var schemas = window.COLLECTION_SCHEMAS;
@@ -26,4 +32,12 @@ window.COLLECTIONS = Object.keys(window.COLLECTION_SCHEMAS).reduce(function (acc
   return acc;
 }, {});
 
-console.log("collections-init.js loaded (" + Object.keys(window.COLLECTIONS).length + " collections)");
+var collectionCount = Object.keys(window.COLLECTIONS).length;
+console.log('[CollectionsEngine] ' + collectionCount + ' collections loaded.');
+console.table(Object.keys(window.COLLECTION_SCHEMAS).reduce(function (acc, key) {
+  var schema = window.COLLECTION_SCHEMAS[key];
+  var primary = schema.primary ? schema.primary.key : '—';
+  var extra = (schema.extraFields || []).map(function (f) { return f.key; }).join(', ') || '—';
+  acc[key] = { primary: primary, fields: extra };
+  return acc;
+}, {}));

@@ -1,3 +1,4 @@
+// Fields: name (primary)
 window.COLLECTION_SCHEMAS.services_categories = {
   key: 'services_categories',
   label: 'Categories',

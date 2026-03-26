@@ -1,4 +1,8 @@
-// App — hash router, dashboard page, main render
+// App.js — CollectionsEngine Runtime (Router + Renderer)
+//
+// Reads window.COLLECTIONS (built by collections-init.js) at startup.
+// Dynamically renders Nav, ListPage, EditorPage based on the active route.
+// Adding/removing a collection schema = automatic UI change. No code edits here needed.
 
 const { useState: useAppState, useEffect: useAppEffect } = React;
 
@@ -371,6 +375,26 @@ function DashboardPage() {
 
         {/* Dev: Start server command (localhost only) */}
         {isLocalHostName(window.location.hostname) && <DevServerCard />}
+
+        {/* API Meta — quick link to self-documenting API contract */}
+        <div>
+          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-widest" style={{ marginBottom: '1rem' }}>API</h2>
+          <div style={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: '1rem', padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <label className="block text-sm font-medium text-gray-700" style={{ marginBottom: '0.35rem' }}>Public API</label>
+            <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.75rem' }}>
+              Self-documenting endpoint — lists all collections, routes, and examples.
+            </p>
+            <a
+              href={window.API_BASE + '/meta'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="uk-button uk-button-secondary"
+              style={{ textDecoration: 'none' }}
+            >
+              Open /api/meta ↗
+            </a>
+          </div>
+        </div>
 
         {/* Direction */}
         <div>

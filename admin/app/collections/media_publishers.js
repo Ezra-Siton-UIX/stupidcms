@@ -1,3 +1,4 @@
+// Fields: name (primary) | logo_url
 window.COLLECTION_SCHEMAS.media_publishers = {
   key: 'media_publishers',
   label: 'Publishers',

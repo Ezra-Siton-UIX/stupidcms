@@ -1,3 +1,4 @@
+// Fields: name (primary) | image_url, role, company, category_id, linkedin, bio
 window.COLLECTION_SCHEMAS.team = {
   key: 'team',
   label: 'Team',

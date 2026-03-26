@@ -1,3 +1,4 @@
+// Fields: name (primary) | category_id, image_url, body
 window.COLLECTION_SCHEMAS.services = {
   key: 'services',
   label: 'Services',

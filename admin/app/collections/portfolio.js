@@ -1,3 +1,4 @@
+// Fields: name (primary) | category_id, image_url, body, project_url
 window.COLLECTION_SCHEMAS.portfolio = {
   key: 'portfolio',
   label: 'Portfolio',

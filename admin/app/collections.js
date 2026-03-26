@@ -1,6 +1,14 @@
-// collections.js — Core setup: API_BASE, build helpers, field registry, site domains.
+// collections.js — CollectionsEngine Core
+//
+// Responsibilities:
+//   - Exposes window.API_BASE (backend URL, auto-detected local vs. Railway)
+//   - Defines window.FIELD_TYPE_REGISTRY (all supported field types)
+//   - Exposes window.buildCollection() (used by collections-init.js)
+//   - Defines window.SITE_DOMAINS (per-site slug prefixes)
+//   - Initializes window.COLLECTION_SCHEMAS = {} (schemas register themselves here)
+//
 // Individual schemas live in admin/app/collections/*.js
-// Final build happens in collections-init.js
+// Final COLLECTIONS object is built in collections-init.js
 
 (function () {
   function getStorageValue(key) {

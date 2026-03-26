@@ -1,3 +1,4 @@
+// Fields: name (primary)
 window.COLLECTION_SCHEMAS.portfolio_categories = {
   key: 'portfolio_categories',
   label: 'Categories',

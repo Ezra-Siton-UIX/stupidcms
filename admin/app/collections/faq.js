@@ -1,3 +1,4 @@
+// Fields: question (primary) | category_id, answer
 window.COLLECTION_SCHEMAS.faq = {
   key: 'faq',
   label: 'FAQ',

@@ -1,3 +1,4 @@
+// Fields: name (primary) | role, image_url
 window.COLLECTION_SCHEMAS.blog_authors = {
   key: 'blog_authors',
   label: 'Authors',

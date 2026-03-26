@@ -8,6 +8,34 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// ╔═══════════════════════════════════════════════════════════╗
+// ║  StupidCMS — JSON API Server                             ║
+// ╠═══════════════════════════════════════════════════════════╣
+// ║  Route Map:                                              ║
+// ║                                                          ║
+// ║  AUTH                                                    ║
+// ║    POST   /api/login                                     ║
+// ║    GET    /api/health                                    ║
+// ║    GET    /api/meta          (self-documenting contract)  ║
+// ║                                                          ║
+// ║  PUBLIC (no token)                                       ║
+// ║    GET    /api/public/:site/:collection                  ║
+// ║    GET    /api/public/:site/posts/by-author/:authorId    ║
+// ║    GET    /api/public/:site/posts/by-category/:catId     ║
+// ║    GET    /api/public/:site/:collection/by-category/:id  ║
+// ║                                                          ║
+// ║  ADMIN CRUD (token required)                             ║
+// ║    GET    /api/:site/:collection                         ║
+// ║    GET    /api/:site/:collection/:id                     ║
+// ║    GET    /api/:site/:collection/by-category/:catId      ║
+// ║    POST   /api/:site/upload           (Cloudinary)       ║
+// ║    POST   /api/:site/:collection      (create)           ║
+// ║    PUT    /api/:site/:collection/:id  (update)           ║
+// ║    DELETE /api/:site/:collection/:id  (delete)           ║
+// ║                                                          ║
+// ║  Data: server/data/site_*/<collection>.json              ║
+// ╚═══════════════════════════════════════════════════════════╝
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -31,7 +59,7 @@ if (process.env.CLOUDINARY_URL) {
 }
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_IMAGE_UPLOAD_BYTES } });
 
-// ── Helpers ──────────────────────────────────────────────
+// ── Helpers: JSON read/write ─────────────────────────────
 function readJSON(filePath) {
   if (!fs.existsSync(filePath)) return [];
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -42,6 +70,7 @@ function writeJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
+// ── Collection path mapping (key → file path) ───────────
 const COLLECTION_PATHS = {
   posts: ['blog', 'posts.json'],
   blog_authors: ['blog', 'authors.json'],
@@ -59,6 +88,7 @@ const COLLECTION_PATHS = {
   legal: ['legal.json'],
 };
 
+// ── Legacy fallback paths (pre-subfolder structure) ──────
 const LEGACY_COLLECTION_PATHS = {
   media: ['media.json'],
   media_publishers: ['media_publishers.json'],
@@ -72,6 +102,7 @@ const LEGACY_COLLECTION_PATHS = {
   portfolio_categories: ['portfolio_categories.json'],
 };
 
+// ── Path resolver: site + collection → absolute file path
 function collectionFile(site, collection) {
   const relativePath = COLLECTION_PATHS[collection];
   if (!relativePath) return null;
@@ -90,6 +121,7 @@ function collectionFile(site, collection) {
   return preferredPath;
 }
 
+// ── Cloudinary upload folder mapping ─────────────────────
 function getUploadFolder(site, requestedCollection) {
   const uploadFolders = {
     posts: 'blog/posts',
@@ -108,6 +140,7 @@ function getUploadFolder(site, requestedCollection) {
   return 'stupidcms/' + site;
 }
 
+// ── Collection readers + filters ─────────────────────────
 function readCollection(site, collection) {
   const file = collectionFile(site, collection);
   if (!file) return null;
@@ -126,14 +159,14 @@ function filterCollectionByField(site, collection, field, value) {
   return items.filter(item => item[field] === value);
 }
 
-// ── User -> Site mapping (hardcoded for now) ─────────────
+// ── Users + JWT (hardcoded for now) ──────────────────────
 const USERS = {
   'bobby': { site_id: 'site_bobby', password: 'password' },
 };
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-in-production';
 
-// ── Auth middleware ──────────────────────────────────────
+// ── Auth middleware (JWT verify + site_id check) ─────────
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token' });
@@ -167,6 +200,58 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ── GET /api/meta — self-documenting API contract ────────
+app.get('/api/meta', (req, res) => {
+  const sites = [...new Set(Object.values(USERS).map(u => u.site_id))];
+  const firstSite = sites[0] || ':site';
+  const base = req.protocol + '://' + req.get('host');
+
+  res.json({
+    name: 'StupidCMS API',
+    build: SERVER_BUILD,
+    sites: sites,
+    collections: Object.keys(COLLECTION_PATHS),
+    auth: {
+      login: 'POST /api/login',
+      body: { username: 'string', password: 'string' },
+      response: 'Returns { token, username, site_id }',
+      scheme: 'Bearer JWT — send as Authorization: Bearer <token>',
+    },
+    routes: {
+      public: [
+        { method: 'GET', path: '/api/public/:site/:collection', description: 'All items in a collection' },
+        { method: 'GET', path: '/api/public/:site/:collection/by-category/:categoryId', description: 'Items filtered by category' },
+        { method: 'GET', path: '/api/public/:site/posts/by-author/:authorId', description: 'Posts filtered by author' },
+        { method: 'GET', path: '/api/public/:site/posts/by-category/:categoryId', description: 'Posts filtered by category' },
+      ],
+      admin: [
+        { method: 'GET', path: '/api/:site/:collection', description: 'All items (auth required)' },
+        { method: 'GET', path: '/api/:site/:collection/:id', description: 'Single item by ID' },
+        { method: 'GET', path: '/api/:site/:collection/by-category/:categoryId', description: 'Filter by category' },
+        { method: 'GET', path: '/api/:site/posts/by-author/:authorId', description: 'Posts by author' },
+        { method: 'POST', path: '/api/:site/:collection', description: 'Create new item' },
+        { method: 'PUT', path: '/api/:site/:collection/:id', description: 'Update item' },
+        { method: 'DELETE', path: '/api/:site/:collection/:id', description: 'Delete item' },
+        { method: 'POST', path: '/api/:site/upload', description: 'Upload image (multipart, field: file)' },
+      ],
+    },
+    examples: {
+      health: base + '/api/health',
+      meta: base + '/api/meta',
+      allPosts: base + '/api/public/' + firstSite + '/posts',
+      allTeam: base + '/api/public/' + firstSite + '/team',
+      allFaq: base + '/api/public/' + firstSite + '/faq',
+      teamCategories: base + '/api/public/' + firstSite + '/team_categories',
+      postsByCategory: base + '/api/public/' + firstSite + '/posts/by-category/:categoryId',
+      postsByAuthor: base + '/api/public/' + firstSite + '/posts/by-author/:authorId',
+    },
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+// PUBLIC ROUTES (no token)
+// ══════════════════════════════════════════════════════════
+
 // ── PUBLIC: GET /api/public/:site/:collection ─────────────
 app.get('/api/public/:site/:collection', (req, res) => {
   const file = collectionFile(req.params.site, req.params.collection);
@@ -197,6 +282,10 @@ app.get('/api/public/:site/:collection/by-category/:categoryId', (req, res) => {
   if (!items) return res.status(400).json({ error: 'Invalid site or collection' });
   res.json(items);
 });
+
+// ══════════════════════════════════════════════════════════
+// ADMIN ROUTES (token required)
+// ══════════════════════════════════════════════════════════
 
 // ── GET /api/:site/:collection ────────────────────────────
 app.get('/api/:site/:collection', authMiddleware, (req, res) => {
@@ -255,7 +344,7 @@ app.get('/api/:site/:collection/:id', authMiddleware, (req, res) => {
   res.json(item);
 });
 
-// ── POST /api/:site/upload ────────────────────────────────
+// ── POST /api/:site/upload (Cloudinary) ──────────────────
 app.post('/api/:site/upload', authMiddleware, (req, res, next) => {
   upload.single('file')(req, res, (err) => {
     if (!err) return next();
@@ -299,7 +388,7 @@ app.post('/api/:site/upload', authMiddleware, (req, res, next) => {
   stream.end(req.file.buffer);
 });
 
-// ── POST /api/:site/:collection ──────────────────────────
+// ── POST /api/:site/:collection (create item) ───────────
 app.post('/api/:site/:collection', authMiddleware, (req, res) => {
   if (req.user.site_id !== req.params.site) {
     return res.status(403).json({ error: 'Forbidden' });
@@ -313,7 +402,7 @@ app.post('/api/:site/:collection', authMiddleware, (req, res) => {
   res.status(201).json(item);
 });
 
-// ── PUT /api/:site/:collection/:id ───────────────────────
+// ── PUT /api/:site/:collection/:id (update item) ────────
 app.put('/api/:site/:collection/:id', authMiddleware, (req, res) => {
   if (req.user.site_id !== req.params.site) {
     return res.status(403).json({ error: 'Forbidden' });
@@ -328,7 +417,7 @@ app.put('/api/:site/:collection/:id', authMiddleware, (req, res) => {
   res.json(items[idx]);
 });
 
-// ── DELETE /api/:site/:collection/:id ────────────────────
+// ── DELETE /api/:site/:collection/:id (remove item) ─────
 app.delete('/api/:site/:collection/:id', authMiddleware, (req, res) => {
   if (req.user.site_id !== req.params.site) {
     return res.status(403).json({ error: 'Forbidden' });
@@ -342,6 +431,10 @@ app.delete('/api/:site/:collection/:id', authMiddleware, (req, res) => {
   writeJSON(file, items);
   res.json(deleted);
 });
+
+// ══════════════════════════════════════════════════════════
+// STATIC FILES + SERVER START
+// ══════════════════════════════════════════════════════════
 
 // ── Serve static files ───────────────────────────────────
 app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));

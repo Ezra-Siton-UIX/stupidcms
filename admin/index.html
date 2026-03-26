@@ -56,10 +56,24 @@
         }
       }
       var build = encodeURIComponent(window.APP_BUILD);
-      // Core setup (API_BASE, build helpers, field registry)
+
+      // ═══════════════════════════════════════════════
+      // StupidCMS — CollectionsEngine Boot
+      // ═══════════════════════════════════════════════
+      // How it works:
+      //   1. collections.js     — Engine core: field registry, buildCollection, API_BASE
+      //   2. collections/*.js   — Schema definitions (one per collection)
+      //   3. collections-init.js — Validates schemas + builds window.COLLECTIONS
+      //   4. App.js             — Router reads window.COLLECTIONS → renders UI dynamically
+      //
+      // To add a collection: create a schema file here, add an await load() below.
+      // To remove a collection: delete the file and its load() line.
+      // ═══════════════════════════════════════════════
+
+      // [1] Engine core
       await load('app/collections.js?v=' + build);
-      // Collection schemas
-      await load('app/collections/posts.js?v=' + build);
+      // [2] Collection schemas
+      await load('app/collections/blog_posts.js?v=' + build);
       await load('app/collections/blog_authors.js?v=' + build);
       await load('app/collections/blog_categories.js?v=' + build);
       await load('app/collections/media.js?v=' + build);
@@ -73,10 +87,11 @@
       await load('app/collections/portfolio.js?v=' + build);
       await load('app/collections/portfolio_categories.js?v=' + build);
       await load('app/collections/legal.js?v=' + build);
-      // Build final COLLECTIONS object
+      // [3] Engine boot — validate + build window.COLLECTIONS
       await load('app/collections-init.js?v=' + build);
+      // [4] Helpers & API layer
       await load('app/helpers.js?v=' + build);
-      // Components — order matters (dependencies first)
+      // [5] UI Components — order matters (dependencies first)
       await load('app/components/OutlineIcon.js?v=' + build);
       await load('app/components/ToastContainer.js?v=' + build);
       await load('app/components/AlertBox.js?v=' + build);

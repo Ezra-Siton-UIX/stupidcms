@@ -1,3 +1,4 @@
+// Fields: title (primary) | article_date, author_id, category_id, image_url, article_summary, article_body, featured
 window.COLLECTION_SCHEMAS.posts = {
   key: 'posts',
   label: 'Posts',

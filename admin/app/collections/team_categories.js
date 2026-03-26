@@ -1,3 +1,4 @@
+// Fields: name (primary)
 window.COLLECTION_SCHEMAS.team_categories = {
   key: 'team_categories',
   label: 'Categories',

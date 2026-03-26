@@ -1,3 +1,4 @@
+// Fields: name (primary) | article_date, image_url, publisher_id, article_url
 window.COLLECTION_SCHEMAS.media = {
   key: 'media',
   label: 'Media',

@@ -1,3 +1,4 @@
+// Fields: name (primary)
 window.COLLECTION_SCHEMAS.faq_categories = {
   key: 'faq_categories',
   label: 'Categories',
