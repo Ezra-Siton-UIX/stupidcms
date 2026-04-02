@@ -99,11 +99,14 @@ window.buildCollection = function buildCollection(schema) {
 };
 
 // --- Site domains (developer-defined, not editable by clients) ---
+// ⚠️  ONE place to update when Railway URL changes.
+// Used by: getSiteDomain() → sitemap preview, Developer debug API URLs.
+// Local (localhost) overrides these automatically — only affects production/Railway.
 
 window.SITE_DOMAINS = {
-  site_bobby: 'https://demo-bobby.example.com',
+  site_bobby: 'https://stupidcms-production.up.railway.app',
 };
-window.DEFAULT_SITE_DOMAIN = 'https://demo-site.example.com';
+window.DEFAULT_SITE_DOMAIN = 'https://stupidcms-production.up.railway.app';
 
 (function () {
   function isLocalHttpUrl(value) {

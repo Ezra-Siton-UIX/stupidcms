@@ -619,9 +619,18 @@ window.EditorPage = function EditorPage({ collection, itemId }) {
               <span style={{ marginLeft: '0.45rem', fontWeight: 400, color: '#94a3b8' }}>Schema + item JSON</span>
             </summary>
             <div style={{ padding: '0 0.85rem 0.85rem', borderTop: '1px solid #f1f5f9' }}>
-              <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: '0.75rem 0 0.65rem' }}>
+              <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: '0.75rem 0 0.4rem' }}>
                 Development helper. Inspect field keys, order, and the current values loaded in this editor.
               </p>
+              {!isNew && (
+                <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 0.65rem', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                  <span style={{ color: '#94a3b8', marginRight: '0.35rem' }}>GET</span>
+                  {(() => {
+                    const base = domain + '/api/public/' + getSiteId() + '/' + collection + '/' + itemId;
+                    return <a href={base} target="_blank" rel="noopener" style={{ color: '#3b82f6', textDecoration: 'none' }}>{base}</a>;
+                  })()}
+                </p>
+              )}
 
               <div style={{ display: 'flex', gap: '0.45rem', marginBottom: '0.75rem' }}>
                 <button

@@ -98,3 +98,32 @@ All field types available for collection schemas. Defined in `admin/app/collecti
 
 ### Media fields
 - `image` — Cloudinary image upload with drag-drop. Properties: `previewMode` (`avatar` or `cover`), `imageSize` (`cover`, `medium`, `small`).
+
+## Adding a New Collection
+
+1. Create a new file `admin/app/collections/{name}.js` — use an existing collection as a template.
+2. Define `window.COLLECTION_{NAME}` with the schema object. Required top-level keys:
+   - `key` — unique snake_case identifier (e.g. `"testimonials"`)
+   - `label` — plural display name (e.g. `"Testimonials"`)
+   - `singular` — single item name (e.g. `"Testimonial"`)
+   - `navGroup` — which nav tab it appears under (e.g. `"content"`, `"media"`, `"settings"`)
+   - `fields` — array of field definitions (see Schema Field Type Reference above)
+3. Register it in `admin/app/collections-init.js` — add the key to `COLLECTIONS` and import the file.
+4. Add the collection key to the server's allowed collections list in `server/server.js` (look for `ALLOWED_COLLECTIONS`).
+5. The JSON data file will be auto-created at `server/data/{site_id}/{key}.json` on first write.
+
+## Public API Reference
+
+All collections are exposed as read-only public endpoints (no auth required):
+
+```
+GET {server}/api/public/{site_id}/{collection}
+```
+
+Example:
+```
+GET http://localhost:3000/api/public/bobby/team
+GET http://localhost:3000/api/public/bobby/posts
+```
+
+The Developer Debug panel inside each collection list page shows the exact URL for the current collection and site.

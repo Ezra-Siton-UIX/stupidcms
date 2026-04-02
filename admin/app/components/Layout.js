@@ -24,7 +24,7 @@ window.Layout = function Layout({ activeTab, breadcrumbs, children }) {
               {isLocalHostName(window.location.hostname) ? 'LOCAL' : 'LIVE'}
             </span>
             {window.location.port === '3001' && (
-              <span style={{ marginLeft: '0.2rem', fontSize: '0.5rem', fontWeight: 700, color: '#f97316', verticalAlign: 'middle', opacity: 0.7 }}>W</span>
+              <span title="Webiny dev server (port 3001)" style={{ marginLeft: '0.2rem', fontSize: '0.5rem', fontWeight: 700, color: '#f97316', verticalAlign: 'middle', opacity: 0.7 }}>W</span>
             )}
           </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

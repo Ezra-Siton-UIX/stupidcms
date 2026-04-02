@@ -37,6 +37,7 @@ window.ListPage = function ListPage({ collection }) {
   const jsonPreviewItems = items.slice(0, 10);
   const hasMoreJsonItems = items.length > jsonPreviewItems.length;
   const sitemapPreview = buildCollectionSitemapPreview(config, collection, rawSchema, items, domain);
+  const publicApiUrl = domain + '/api/public/' + getSiteId() + '/' + collection;
 
   useEffect(() => {
     setLoading(true);
@@ -283,8 +284,12 @@ window.ListPage = function ListPage({ collection }) {
             <span style={{ marginLeft: '0.5rem', fontWeight: 400, color: '#94a3b8' }}>Schema + JSON sample</span>
           </summary>
           <div style={{ padding: '0 1rem 1rem', borderTop: '1px solid #f1f5f9' }}>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.85rem 0 0.75rem' }}>
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.85rem 0 0.5rem' }}>
               Development helper. JSON sample shows up to 10 items from the API response.
+            </p>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 0.75rem', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <span style={{ color: '#94a3b8', marginRight: '0.35rem' }}>GET</span>
+              <a href={publicApiUrl} target="_blank" rel="noopener" style={{ color: '#3b82f6', textDecoration: 'none' }}>{publicApiUrl}</a>
             </p>
 
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.85rem' }}>
