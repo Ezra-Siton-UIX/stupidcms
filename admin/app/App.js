@@ -212,30 +212,30 @@ function DevServerCard() {
             {copied ? '✓ Copied' : 'Copy'}
           </button>
         </div>
-        {serverStatus === 'ok' && (<>
-          <p style={{ fontSize: '0.72rem', color: '#16a34a', marginTop: '0.6rem', fontWeight: 500 }}>
+        <a
+          href="http://localhost:3000/admin/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginTop: '0.6rem', marginBottom: '0.5rem', textDecoration: 'underline' }}
+        >
+          localhost:3000/admin/index.html
+        </a>
+        <a
+          href="http://localhost:3000/admin/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="uk-button uk-button-secondary"
+          style={{ textDecoration: 'none', display: 'inline-block', marginBottom: '0.5rem' }}
+        >
+          Open local admin ↗
+        </a>
+        {serverStatus === 'ok' && (
+          <p style={{ fontSize: '0.72rem', color: '#16a34a', marginTop: '0.4rem', fontWeight: 500 }}>
             ✓ Server is running. Use npm run dev for auto-restart during development.
           </p>
-          <a
-            href="http://localhost:3000/admin/index.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginTop: '0.6rem', marginBottom: '0.5rem', textDecoration: 'underline' }}
-          >
-            localhost:3000/admin/index.html
-          </a>
-          <a
-            href="http://localhost:3000/admin/index.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="uk-button uk-button-secondary"
-            style={{ textDecoration: 'none', display: 'inline-block' }}
-          >
-            Open local admin ↗
-          </a>
-        </>)}
+        )}
         {serverStatus === 'offline' && (
-          <p style={{ fontSize: '0.72rem', color: '#dc2626', marginTop: '0.6rem', fontWeight: 500 }}>
+          <p style={{ fontSize: '0.72rem', color: '#dc2626', marginTop: '0.4rem', fontWeight: 500 }}>
             ✗ Server not detected. Run the command above, then refresh.
           </p>
         )}
@@ -258,8 +258,16 @@ function DashboardPage() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useAppState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useAppState(false);
   const [pendingNavigation, setPendingNavigation] = useAppState(null);
+  const [apiLastUpdated, setApiLastUpdated] = useAppState(null);
 
   const isDirty = dir !== savedDir;
+
+  useAppEffect(() => {
+    fetch(window.API_BASE + '/api/meta', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (d.lastUpdated) setApiLastUpdated(new Date(d.lastUpdated).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })); })
+      .catch(() => {});
+  }, []);
 
   function saveDirChanges() {
     localStorage.setItem('site_dir_' + siteId, dir);
@@ -394,6 +402,7 @@ function DashboardPage() {
             <label className="block text-sm font-medium text-gray-700" style={{ marginBottom: '0.35rem' }}>Public API</label>
             <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.5rem' }}>
               Self-documenting endpoint — lists all collections, routes, and examples.
+              {apiLastUpdated && <span style={{ marginLeft: '0.5rem', color: '#d1d5db' }}>· Last updated: {apiLastUpdated}</span>}
             </p>
             <a
               href={window.API_BASE + '/api/meta'}

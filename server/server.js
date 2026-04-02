@@ -208,10 +208,12 @@ app.get('/api/meta', (req, res) => {
   const sites = [...new Set(Object.values(USERS).map(u => u.site_id))];
   const firstSite = sites[0] || ':site';
   const base = req.protocol + '://' + req.get('host');
+  const lastUpdated = fs.statSync(__filename).mtime.toISOString();
 
   res.json({
     name: 'StupidCMS API',
     build: SERVER_BUILD,
+    lastUpdated,
     sites: sites,
     collections: Object.keys(COLLECTION_PATHS),
     auth: {
