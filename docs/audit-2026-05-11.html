@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StupidCMS — Audit & Improvement Report</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --fg: #1c1917;
+    --muted: #57534e;
+    --border: #e7e5e4;
+    --code-bg: #f5f5f4;
+    --accent: #0369a1;
+    --warn: #c2410c;
+    --good: #15803d;
+    --bad: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    margin: 0;
+    padding: 3rem 1.5rem 5rem;
+  }
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2.2rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 1.55rem;
+    margin: 3rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+    color: var(--fg);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  p { margin: 0.8rem 0; }
+  ul, ol { padding-left: 1.4rem; margin: 0.8rem 0; }
+  li { margin: 0.3rem 0; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+  a:hover { color: #075985; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+    color: #0c4a6e;
+  }
+  pre {
+    background: #292524;
+    color: #fafaf9;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.5;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+  blockquote {
+    border-left: 3px solid var(--border);
+    margin: 1rem 0;
+    padding: 0.4rem 0 0.4rem 1.2rem;
+    color: var(--muted);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    font-size: 0.94rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--code-bg);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0.4rem 0 2rem;
+  }
+  .meta span { display: inline-block; margin-right: 1.2rem; }
+  .tag-good { color: var(--good); font-weight: 600; }
+  .tag-warn { color: var(--warn); font-weight: 600; }
+  .tag-bad  { color: var(--bad); font-weight: 600; }
+  .summary-box {
+    background: #fef3c7;
+    border-left: 4px solid #d97706;
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .summary-box.good {
+    background: #dcfce7;
+    border-left-color: #16a34a;
+  }
+  .nav-toc {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+  }
+  .nav-toc h3 { margin-top: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .nav-toc ol { margin: 0; }
+  .nav-toc li { margin: 0.2rem 0; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>StupidCMS — Audit &amp; Improvement Report</h1>
+<p class="meta">
+  <span><strong>Date:</strong> 2026-05-11</span>
+  <span><strong>Scope:</strong> server, admin, multi-tenant model</span>
+</p>
+
+<div class="nav-toc">
+  <h3>Sections</h3>
+  <ol>
+    <li><a href="#sec1">The Big Picture</a></li>
+    <li><a href="#sec2">Critical Issues</a></li>
+    <li><a href="#sec3">Notable Bugs</a></li>
+    <li><a href="#sec4">UX Gaps in Admin</a></li>
+    <li><a href="#sec5">Improvement Ideas</a></li>
+    <li><a href="#sec6">Security Quick-Wins</a></li>
+    <li><a href="#sec7">What NOT To Do</a></li>
+    <li><a href="#sec8">Suggested Priority Order</a></li>
+    <li><a href="#sec9">Bottom Line</a></li>
+  </ol>
+</div>
+
+<h2 id="sec1">1. The Big Picture (what's actually solid)</h2>
+
+<p>This is <strong>further along than "abandoned project" suggests</strong>:</p>
+
+<ul>
+  <li><strong>460-line Express server</strong> — auth, multi-tenant CRUD, Cloudinary uploads, public + admin routes, self-documenting <code>/api/meta</code></li>
+  <li><strong>Schema-as-code registry</strong> — 14 collections defined</li>
+  <li><strong>12 modular React components</strong> (well-split, none monolithic)</li>
+  <li><strong>No-build SPA</strong> (CDN React + Babel) — admin runs without bundler</li>
+  <li><strong>Multi-tenant by folder</strong> — physical isolation, simpler than any commercial CMS at this scale</li>
+  <li><strong>JWT auth</strong> with site_id binding (a token for <code>bobby</code> cannot read <code>rami</code>'s data)</li>
+  <li><strong>Path traversal protection</strong> via regex sanitization</li>
+  <li><strong>Cloudinary integration</strong> with auto-format + auto-quality URLs</li>
+  <li><strong>Backend/frontend version coupling check</strong></li>
+</ul>
+
+<div class="summary-box good">
+This is roughly an MVP <strong>already shipped</strong>. The reframing is "polish + close gaps", not "build from scratch".
+</div>
+
+<h2 id="sec2">2. Critical Issues (block production-grade use)</h2>
+
+<h3>2.1 Users hardcoded in server.js</h3>
+<pre><code>const USERS = {
+  'bobby': { site_id: 'site_bobby', password: 'password' },
+};</code></pre>
+<ul>
+  <li><span class="tag-bad">×</span> Plain text password in source control</li>
+  <li><span class="tag-bad">×</span> Adding a new client = git commit + redeploy (cannot onboard via UI)</li>
+  <li><span class="tag-bad">×</span> Single user per site — no team support</li>
+</ul>
+<p><strong>Fix:</strong> move to <code>server/data/_users.json</code>. Add bcrypt hashing. Add <code>npm run user:add</code> CLI.</p>
+
+<h3>2.2 JWT_SECRET fallback is dangerous</h3>
+<pre><code>const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-in-production';</code></pre>
+<p>If env var isn't set on Railway, this fallback is used silently. Anyone who knows StupidCMS's default can forge tokens.</p>
+<p><strong>Fix:</strong> crash on startup if missing in prod.</p>
+
+<h3>2.3 Railway = non-persistent filesystem</h3>
+<p>Every Railway deploy wipes <code>server/data/</code>. Editor changes between deploys are lost.</p>
+<p><strong>Fix options (pick one):</strong></p>
+<ol>
+  <li><strong>Auto-commit to git on every save</strong> — server has GitHub token, runs <code>git add + commit + push</code> after each <code>writeJSON</code>. Auto-backup + persistence. Best fit for the "git is the DB" philosophy.</li>
+  <li><strong>Railway Volume</strong> — persistent disk (~$1-5/mo). No code change.</li>
+  <li><strong>External storage</strong> — S3 for the JSON files. Bigger refactor.</li>
+</ol>
+
+<h3>2.4 No rate limiting on /api/login</h3>
+<p>Plain login route, no throttling. Brute-force friendly.</p>
+<p><strong>Fix:</strong> <code>express-rate-limit</code> — 5 attempts/IP/15min. 10 lines.</p>
+
+<h3>2.5 CORS wide open</h3>
+<pre><code>app.use(cors());  // allows any origin</code></pre>
+<p><strong>Fix:</strong> allowlist via env var (<code>ALLOWED_ORIGINS=...</code>). Public routes can stay open; admin routes should lock down.</p>
+
+<h2 id="sec3">3. Notable Bugs</h2>
+
+<h3>3.1 Nav counts don't update reactively</h3>
+<p>Found live during walkthrough. <code>Layout.js:7</code> reads <code>localStorage.nav_counts</code> once at render. When ListPage updates a count, Layout doesn't re-render.</p>
+<p><strong>Fix (5 min):</strong> dispatch <code>nav_counts_updated</code> event from helpers, Layout listens.</p>
+
+<h3>3.2 Counts only populate on visit</h3>
+<p>A collection that's never been opened shows <code>(0)</code> even if it has items.</p>
+<p><strong>Fix:</strong> add <code>GET /api/:site/counts</code> endpoint, fetch all on mount.</p>
+
+<h3>3.3 Build version brittle coupling</h3>
+<pre><code>const EXPECTED_BACKEND_BUILD = 'stupidcms-admin-2026-03-24';</code></pre>
+<p>Single date string. Any backend deploy → admin refuses to connect.</p>
+<p><strong>Fix:</strong> use semver compatibility, or skip the check entirely.</p>
+
+<h3>3.4 Image upload size limit hardcoded</h3>
+<p>2MB. Hero images today are often 3-5MB pre-Cloudinary.</p>
+<p><strong>Fix:</strong> raise to 8MB. Make env-driven.</p>
+
+<h3>3.5 Legacy collection paths still in code</h3>
+<p>Technical debt from pre-subfolder reorg. If no live data needs them — delete.</p>
+
+<h2 id="sec4">4. UX Gaps in Admin Panel</h2>
+<table>
+  <thead>
+    <tr><th>Gap</th><th>Why it matters</th><th>Effort</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>No search within collection</td><td>Hard to find a post in 50+ items</td><td>Small</td></tr>
+    <tr><td>No bulk delete</td><td>Cleaning old data = click-by-click</td><td>Small</td></tr>
+    <tr><td>No reorder</td><td>Manual sort_order field hack required</td><td>Medium</td></tr>
+    <tr><td>No drafts/preview</td><td>Edit goes live instantly</td><td>Medium</td></tr>
+    <tr><td>No "duplicate" button</td><td>Common pattern</td><td>Tiny</td></tr>
+    <tr><td>No undo after delete</td><td>Mistakes are permanent</td><td>Medium</td></tr>
+    <tr><td>No image gallery view</td><td>Media collection rendered as list</td><td>Small</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec5">5. Improvement Ideas</h2>
+
+<h3>5.1 Auto-commit to git on save <em>(highest leverage)</em></h3>
+<p>Replaces Railway persistence problem AND gives you free version history, audit log, and backup. Each <code>writeJSON</code> triggers a git commit + push. Railway picks up the push and redeploys.</p>
+<p>Bonus: <code>git log --follow data/site_bobby/blog/posts.json</code> = audit trail.</p>
+
+<h3>5.2 Site templates</h3>
+<p>New client = <code>cp -r data/_templates/blank data/site_NEW</code>. Better: <code>npm run site:create -- --name kalayoga</code>.</p>
+
+<h3>5.3 Public RSS feed per site</h3>
+<p><code>GET /api/public/:site/posts.rss</code>. ~30 lines. SEO + feed readers.</p>
+
+<h3>5.4 Markdown export per post</h3>
+<p>For migration / portability. Returns post as clean markdown with frontmatter.</p>
+
+<h3>5.5 Auto-resize image variants</h3>
+<p>After Cloudinary upload, store <code>{ url, url_thumb, url_medium, url_large }</code> using URL transformations.</p>
+
+<h3>5.6 Per-collection access control</h3>
+<p>Schema flag <code>clientCanEdit: false</code> — useful for legal/privacy collections that you control.</p>
+
+<h3>5.7 Schema migrations</h3>
+<p>Add <code>schemaVersion</code> to each record + migration runner: <code>npm run migrate -- posts</code>.</p>
+
+<h3>5.8 First-run onboarding</h3>
+<p>Empty install shows wizard: create admin user, create first site, pick collections.</p>
+
+<h3>5.9 Cloudflare in front of Railway <em>(defer indefinitely)</em></h3>
+<div class="summary-box">
+<p style="margin-top:0"><strong>Skip for now.</strong> Reasons:</p>
+<ul style="margin-bottom:0">
+  <li>Portfolio sites don't generate enough traffic to justify a CDN</li>
+  <li>Cache headers add friction in development ("why isn't my edit showing?")</li>
+  <li>Railway handles this load class without help</li>
+</ul>
+</div>
+
+<p><strong>Reconsider only if:</strong> one client suddenly explodes in traffic (5,000+ daily visitors), studio grows past 30 client sites, or DDoS/scraping concerns become real.</p>
+
+<p>When that day comes — Cloudflare free tier in front of Railway with <code>Cache-Control</code> headers absorbs ~99% of read traffic at the edge. ~30 min setup, $0.</p>
+
+<p><strong>Steps:</strong></p>
+<ol>
+  <li><strong>Sign up at cloudflare.com</strong> (free plan)</li>
+  <li><strong>Add the CMS domain</strong> (e.g., <code>cms.todayweb.com</code>) — Cloudflare gives 2 nameservers</li>
+  <li><strong>Update domain registrar nameservers</strong> — point at Cloudflare's
+    <ul>
+      <li><em>Bonus: Cloudflare offers domain registration at-cost. The studio's domains can consolidate there over time — no markup, free WHOIS privacy.</em></li>
+    </ul>
+  </li>
+  <li><strong>Create CNAME</strong>: <code>cms.todayweb.com</code> → <code>stupidcms-production.up.railway.app</code> (proxied / orange cloud ON)</li>
+  <li><strong>Cloudflare dashboard → Caching → Configuration</strong>: enable "Cache Everything" rule for <code>/api/public/*</code></li>
+  <li><strong>Update server</strong> to send Cache-Control headers on public routes:
+    <pre><code>app.get('/api/public/:site/:collection', (req, res) =&gt; {
+  // ...
+  res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+  res.json(data);
+});</code></pre>
+  </li>
+</ol>
+
+<p><strong>What gets cached:</strong> GET to <code>/api/public/*</code>.<br>
+<strong>What never gets cached:</strong> POST/PUT/DELETE, requests with <code>Authorization</code> header, <code>/api/login</code>.</p>
+
+<p><strong>Optional purge on save:</strong> after admin edit, server calls Cloudflare API to invalidate the cache key. Otherwise edits propagate within cache window (5 min default).</p>
+
+<p><strong>Concrete impact:</strong> site with 1,000 daily visitors → before: 1,000 Railway hits. After: ~24 Railway hits/day. Order-of-magnitude saving.</p>
+
+<h2 id="sec6">6. Security Quick-Wins (low effort, high value)</h2>
+<ol>
+  <li><strong>bcrypt password hashing</strong> — 5 lines, 1 npm install</li>
+  <li><strong>express-rate-limit on /api/login</strong> — 10 lines</li>
+  <li><strong>Force JWT_SECRET in prod</strong> — 3 lines</li>
+  <li><strong>CORS allowlist for admin routes</strong> — 10 lines</li>
+  <li><strong>Helmet middleware</strong> for security headers — 1 line</li>
+</ol>
+<p>Total: <strong>half a day</strong> to close all of them.</p>
+
+<h2 id="sec7">7. What NOT To Do (resist the urge)</h2>
+<p>These would push StupidCMS away from its sweet spot:</p>
+<ul>
+  <li><span class="tag-bad">×</span> <strong>Add a real DB</strong> (Postgres/Mongo) — kills "git is the DB"</li>
+  <li><span class="tag-bad">×</span> <strong>Add a build step</strong> (TypeScript, bundler) — kills "no build" simplicity</li>
+  <li><span class="tag-bad">×</span> <strong>Multi-user + roles + permissions matrix</strong> — kills "1 editor per site" simplicity</li>
+  <li><span class="tag-bad">×</span> <strong>Schema-from-UI</strong> — kills "code is source of truth"</li>
+  <li><span class="tag-bad">×</span> <strong>Embed Next.js</strong> — admin is intentionally separate from public sites</li>
+</ul>
+
+<h2 id="sec8">8. Suggested Priority Order</h2>
+<p>If you give this 1 week of focused work:</p>
+<ol>
+  <li><strong>Day 1</strong> — Critical security fixes (2.1, 2.2, 2.4, 2.5) + nav counts bug (3.1)</li>
+  <li><strong>Day 2</strong> — Auto-commit-to-git (5.1) — solves Railway persistence permanently</li>
+  <li><strong>Day 3</strong> — Site templates + onboarding script (5.2)</li>
+  <li><strong>Day 4-5</strong> — UX gaps that hurt daily use (search, drafts, gallery view)</li>
+  <li><strong>Day 6-7</strong> — Polish, docs, fresh deploy to Railway</li>
+</ol>
+
+<h2 id="sec9">9. The Honest Bottom Line</h2>
+<div class="summary-box good">
+<p style="margin-top:0">StupidCMS already does <strong>the one thing nothing on the market does cleanly</strong>: per-tenant folder isolation with the simplicity of "edit JSON, commit to git".</p>
+<p>Every alternative we evaluated (Decap, Tina, Sanity, Payload) was either logical multi-tenancy or expensive single-tenant. None beat this model for <strong>5 portfolio sites with small blogs</strong>.</p>
+<p style="margin-bottom:0">The gaps in this audit are <strong>polish issues, not architectural mistakes</strong>. Architecture is right.</p>
+</div>
+
+</main>
+</body>
+</html>

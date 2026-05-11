@@ -457,4 +457,16 @@ app.listen(PORT, () => {
   console.log('Local URLs');
   console.log('  Admin Home: ' + baseUrl + '/admin/index.html');
   console.log('  API Health: ' + baseUrl + '/api/health');
+
+  // Auto-open browser in dev mode (skip in production / Railway)
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
+  if (!isProd) {
+    const { exec } = require('child_process');
+    const url = baseUrl + '/admin/index.html';
+    const cmd =
+      process.platform === 'win32' ? 'start "" "' + url + '"' :
+      process.platform === 'darwin' ? 'open "' + url + '"' :
+      'xdg-open "' + url + '"';
+    exec(cmd, (err) => { if (err) console.log('(browser auto-open skipped)'); });
+  }
 });
